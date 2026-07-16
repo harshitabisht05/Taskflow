@@ -1,6 +1,16 @@
-function KanbanColumn({ title, count, children }) {
+import { useDroppable } from "@dnd-kit/core";
+
+function KanbanColumn({ id,title, count, children }) {
+  const { setNodeRef, isOver } = useDroppable({
+  id,
+});
   return (
-    <section className="w-full rounded-2xl border border-[#D8B7A9] bg-[#F8E3D7] p-4">
+    <section ref={setNodeRef}
+  className={`w-full rounded-2xl border p-4 transition ${
+    isOver
+      ? "border-[#96796E] bg-[#F3D3C5]"
+      : "border-[#D8B7A9] bg-[#F8E3D7]"
+  }`}>
       <div className="mb-4 flex items-center justify-between">
         <h2 className="font-semibold text-[#4B302A]">
           {title}

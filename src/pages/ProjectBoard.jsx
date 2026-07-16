@@ -1,5 +1,12 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
+import {
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import { SortableContext,verticalListSortingStrategy,arrayMove,} from "@dnd-kit/sortable";
 
 import KanbanColumn from "../components/kanban/KanbanColumn";
 import TaskCard from "../components/kanban/TaskCard";
@@ -89,6 +96,101 @@ function ProjectBoard() {
     setSelectedTask(null);
   };
 
+
+  const handleDragStart = (event) => {
+    console.log("Dragging task:", event.active.id);
+  };
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+
+    if (!over) return;
+
+    setTasks((currentTasks) => {
+      const activeIndex = currentTasks.findIndex(
+        (task) => task.id === active.id
+      );
+
+      if (activeIndex === -1) {
+        return currentTasks;
+      }
+
+      const activeTask = currentTasks[activeIndex];
+
+      // Check whether we dropped directly onto a column
+      const targetColumn = kanbanColumns.find(
+        (column) => column.id === over.id
+      );
+
+      if (targetColumn) {
+        // Already belongs to this column
+        if (activeTask.status === targetColumn.id) {
+          return currentTasks;
+        }
+
+        return currentTasks.map((task) =>
+          task.id === active.id
+            ? {
+                ...task,
+                status: targetColumn.id,
+              }
+            : task
+        );
+      }
+
+      // Otherwise, we dropped over another task
+      const overIndex = currentTasks.findIndex(
+        (task) => task.id === over.id
+      );
+
+      if (overIndex === -1) {
+        return currentTasks;
+      }
+
+      const overTask = currentTasks[overIndex];
+
+      // Reordering inside the same column
+      if (activeTask.status === overTask.status) {
+        return arrayMove(
+          currentTasks,
+          activeIndex,
+          overIndex
+        );
+      }
+
+      // Moving onto a task in another column
+      const updatedTasks = currentTasks.map((task) =>
+        task.id === active.id
+          ? {
+              ...task,
+              status: overTask.status,
+            }
+          : task
+      );
+
+      const updatedActiveIndex = updatedTasks.findIndex(
+        (task) => task.id === active.id
+      );
+
+      const updatedOverIndex = updatedTasks.findIndex(
+        (task) => task.id === over.id
+      );
+
+      return arrayMove(
+        updatedTasks,
+        updatedActiveIndex,
+        updatedOverIndex
+      );
+    });
+  };
+
+  const sensors = useSensors(
+  useSensor(PointerSensor, {
+    activationConstraint: {
+      distance: 8,
+    },
+  })
+);
   return (
     <div className="min-h-full bg-[#FFF3DF] p-4 md:p-8">
       {/* Project Header */}
@@ -119,6 +221,11 @@ function ProjectBoard() {
       </div>
 
       {/* Kanban Board */}
+      <DndContext
+        sensors={sensors}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
       <div className="mt-8">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
           {kanbanColumns.map((column) => {
@@ -127,25 +234,32 @@ function ProjectBoard() {
             return (
               <KanbanColumn
                 key={column.id}
+                id={column.id}
                 title={column.title}
                 count={columnTasks.length}
               >
-                {columnTasks.map((task) => (
-                  <TaskCard
-                    key={task.id}
-                    title={task.title}
-                    description={task.description}
-                    priority={task.priority}
-                    dueDate={task.dueDate}
-                    onClick={() => setSelectedTask(task)}
-                  />
-                ))}
+                <SortableContext
+                  items={columnTasks.map((task) => task.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {columnTasks.map((task) => (
+                    <TaskCard
+                      key={task.id}
+                      id={task.id}
+                      title={task.title}
+                      description={task.description}
+                      priority={task.priority}
+                      dueDate={task.dueDate}
+                      onClick={() => setSelectedTask(task)}
+                    />
+                  ))}
+                </SortableContext>
               </KanbanColumn>
             );
           })}
         </div>
       </div>
-
+          </DndContext>
       {/* Create Task Modal */}
       {isTaskModalOpen && (
         <TaskModal

@@ -1,10 +1,29 @@
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
 function TaskCard({
+  id,
   title,
   description,
   priority,
   dueDate,
   onClick,
 }) {
+
+  const {
+  attributes,
+  listeners,
+  setNodeRef,
+  transform,
+  transition,
+  isDragging,
+} = useSortable({
+  id,
+});
+const style = {
+  transform: CSS.Transform.toString(transform),
+  transition,
+};
   const priorityStyles = {
     High: "bg-[#F2B8A8] text-[#6B352B]",
     Medium: "bg-[#F5D5B8] text-[#76512F]",
@@ -13,8 +32,14 @@ function TaskCard({
 
   return (
     <article
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
       onClick={onClick}
-      className="cursor-pointer rounded-2xl border border-[#E2C4B8] bg-[#FFF9F2] p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md"
+      className={`cursor-grab rounded-2xl border border-[#E2C4B8] bg-[#FFF9F2] p-4 shadow-sm transition-shadow hover:shadow-md active:cursor-grabbing ${
+        isDragging ? "opacity-50" : ""
+      }`}
     >
       <div className="flex items-start justify-between gap-3">
         <h3 className="font-semibold leading-6 text-[#4B302A]">
