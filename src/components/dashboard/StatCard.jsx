@@ -1,11 +1,11 @@
 function StatCard({ title, value }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-      <p className="text-sm font-medium text-slate-500">
+    <div className="rounded-3xl border border-[#B88E80] bg-[#EDB7A6] p-5 shadow-md transition duration-200 hover:-translate-y-1 hover:shadow-lg">
+      <p className="text-sm font-medium text-[#795D54]">
         {title}
       </p>
 
-      <p className="mt-2 text-3xl font-bold text-slate-900">
+      <p className="mt-2 text-2xl font-semibold text-[#4B302A]">
         {value}
       </p>
     </div>

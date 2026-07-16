@@ -1,13 +1,11 @@
 function Header() {
   return (
-    <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 md:px-8">
-      <div>
-        <p className="text-sm text-slate-500">
-          Project Management
-        </p>
-      </div>
+    <header className="flex h-16 items-center justify-between bg-[#96796E] px-4 text-[#FFF4E3] md:px-6">
+      <p className="text-sm font-medium">
+        Project Management
+      </p>
 
-      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-sm font-semibold text-white">
+      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#4B302A] text-lg font-medium text-white">
         U
       </div>
     </header>

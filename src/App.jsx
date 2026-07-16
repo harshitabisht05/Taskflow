@@ -1,12 +1,10 @@
 import {
-  BrowserRouter,
-  Navigate,
-  Route,
-  Routes,
+  BrowserRouter,Navigate,Route,Routes,
 } from "react-router-dom";
 
 import AppLayout from "./components/layout/AppLayout";
 import Dashboard from "./pages/Dashboard";
+import ProjectBoard from "./pages/ProjectBoard";
 
 function App() {
   return (
@@ -19,6 +17,7 @@ function App() {
           />
 
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/projects/:projectId/board" element={<ProjectBoard />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -1,16 +1,17 @@
 import StatCard from "../components/dashboard/StatCard";
 import ProjectCard from "../components/dashboard/ProjectCard";
 import mockProjects from "../data/mockProjects";
+import ProjectBoard from "./ProjectBoard";
 
 function Dashboard() {
   return (
     <div className="p-4 md:p-8">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">
+        <h1 className="text-3xl font-semibold text-[#4B302A]">
           Dashboard
         </h1>
 
-        <p className="mt-2 text-slate-600">
+        <p className="mt-1 text-sm text-[#96796E]">
           Welcome to TaskFlow. Manage your projects and track your progress.
         </p>
       </div>
@@ -23,12 +24,12 @@ function Dashboard() {
       </section>
 
       <section className="mt-10">
-        <div className="mb-5">
-          <h2 className="text-xl font-semibold text-slate-900">
+        <div className="mt-14">
+          <h2 className="text-2xl font-semibold text-[#4B302A]">
             Recent Projects
           </h2>
 
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-[#96796E]">
             Your recently active projects.
           </p>
         </div>
@@ -37,6 +38,7 @@ function Dashboard() {
           {mockProjects.map((project) => (
             <ProjectCard
               key={project.id}
+              id={project.id}
               name={project.name}
               description={project.description}
               status={project.status}
