@@ -16,6 +16,13 @@ app.use(
 // Middleware
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Welcome to TaskFlow API",
+  });
+});
+
 // Health-check route
 app.get("/api/health", (req, res) => {
   res.status(200).json({
