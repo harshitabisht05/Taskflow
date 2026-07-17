@@ -9,21 +9,22 @@ function TaskCard({
   dueDate,
   onClick,
 }) {
-
   const {
-  attributes,
-  listeners,
-  setNodeRef,
-  transform,
-  transition,
-  isDragging,
-} = useSortable({
-  id,
-});
-const style = {
-  transform: CSS.Transform.toString(transform),
-  transition,
-};
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
   const priorityStyles = {
     High: "bg-[#F2B8A8] text-[#6B352B]",
     Medium: "bg-[#F5D5B8] text-[#76512F]",
@@ -34,10 +35,8 @@ const style = {
     <article
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      {...listeners}
       onClick={onClick}
-      className={`cursor-grab rounded-2xl border border-[#E2C4B8] bg-[#FFF9F2] p-4 shadow-sm transition-shadow hover:shadow-md active:cursor-grabbing ${
+      className={`rounded-2xl border border-[#E2C4B8] bg-[#FFF9F2] p-4 shadow-sm transition-shadow hover:shadow-md ${
         isDragging ? "opacity-50" : ""
       }`}
     >
@@ -46,8 +45,21 @@ const style = {
           {title}
         </h3>
 
+        <button
+          type="button"
+          {...attributes}
+          {...listeners}
+          onClick={(event) => event.stopPropagation()}
+          className="cursor-grab rounded-lg px-2 py-1 text-[#96796E] hover:bg-[#F1E5DD] active:cursor-grabbing"
+          aria-label="Drag task"
+        >
+          ⋮⋮
+        </button>
+      </div>
+
+      <div className="mt-2">
         <span
-          className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
+          className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${
             priorityStyles[priority] ??
             "bg-[#F1E5DD] text-[#795D54]"
           }`}
@@ -62,7 +74,9 @@ const style = {
 
       <div className="mt-4 border-t border-[#E8D2C8] pt-3">
         <p className="text-xs font-medium text-[#96796E]">
-          {dueDate ? `Due ${dueDate}` : "No due date"}
+          {dueDate
+            ? `Due ${dueDate}`
+            : "No due date"}
         </p>
       </div>
     </article>

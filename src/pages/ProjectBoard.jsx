@@ -1,20 +1,38 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+
+import {
   DndContext,
   PointerSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { SortableContext,verticalListSortingStrategy,arrayMove,} from "@dnd-kit/sortable";
+
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
 
 import KanbanColumn from "../components/kanban/KanbanColumn";
 import TaskCard from "../components/kanban/TaskCard";
 import TaskModal from "../components/kanban/TaskModal";
 import TaskDetailsModal from "../components/kanban/TaskDetailsModal";
 
-import mockTasks from "../data/mockTasks";
-import mockProjects from "../data/mockProjects";
+import { getProjectById } from "../api/projectApi";
+
+import {
+  getTasks,
+  createTask,
+  updateTask,
+  deleteTask,
+  reorderTasks,
+} from "../api/taskApi";
 
 const kanbanColumns = [
   {
@@ -38,164 +56,268 @@ const kanbanColumns = [
 function ProjectBoard() {
   const { projectId } = useParams();
 
-  const [tasks, setTasks] = useState(mockTasks);
-  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-  const [selectedTask, setSelectedTask] = useState(null);
+  const queryClient = useQueryClient();
 
-  // Find the current project using the project ID from the URL
-  const project = mockProjects.find(
-    (project) => project.id === Number(projectId)
-  );
+  const [isTaskModalOpen, setIsTaskModalOpen] =
+    useState(false);
 
-  // Get tasks belonging to the current project and column
+  const [selectedTask, setSelectedTask] =
+    useState(null);
+
+  // Fetch current project
+  const {
+    data: project,
+    isLoading: isProjectLoading,
+    isError: isProjectError,
+  } = useQuery({
+    queryKey: ["project", projectId],
+    queryFn: () => getProjectById(projectId),
+    enabled: Boolean(projectId),
+  });
+
+  // Fetch project tasks
+  const {
+    data: tasks = [],
+    isLoading: areTasksLoading,
+    isError: areTasksError,
+  } = useQuery({
+    queryKey: ["tasks", projectId],
+    queryFn: () => getTasks(projectId),
+    enabled: Boolean(projectId),
+  });
+
+  // Create task
+  const createTaskMutation = useMutation({
+    mutationFn: (taskData) =>
+      createTask(projectId, taskData),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["tasks", projectId],
+      });
+
+      setIsTaskModalOpen(false);
+    },
+  });
+
+  // Update task
+  const updateTaskMutation = useMutation({
+    mutationFn: (updatedTask) =>
+      updateTask(
+        projectId,
+        updatedTask._id,
+        updatedTask
+      ),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["tasks", projectId],
+      });
+
+      setSelectedTask(null);
+    },
+  });
+
+  // Delete task
+  const deleteTaskMutation = useMutation({
+    mutationFn: (taskId) =>
+      deleteTask(projectId, taskId),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["tasks", projectId],
+      });
+
+      setSelectedTask(null);
+    },
+  });
+
+  // Persist drag-and-drop ordering
+  const reorderTasksMutation = useMutation({
+    mutationFn: (updatedTasks) =>
+      reorderTasks(projectId, updatedTasks),
+
+    onError: () => {
+      // Restore server state if reorder fails
+      queryClient.invalidateQueries({
+        queryKey: ["tasks", projectId],
+      });
+    },
+  });
+
   const getTasksByStatus = (status) => {
     return tasks.filter(
-      (task) =>
-        task.projectId === Number(projectId) &&
-        task.status === status
+      (task) => task.status === status
     );
   };
 
-  // Create a new task
   const handleCreateTask = (formData) => {
-    const newTask = {
-      id: Date.now(),
-      projectId: Number(projectId),
-      ...formData,
-    };
-
-    setTasks((currentTasks) => [
-      ...currentTasks,
-      newTask,
-    ]);
-
-    setIsTaskModalOpen(false);
+    createTaskMutation.mutate(formData);
   };
 
-  // Update an existing task
   const handleUpdateTask = (updatedTask) => {
-    setTasks((currentTasks) =>
-      currentTasks.map((task) =>
-        task.id === updatedTask.id
-          ? updatedTask
-          : task
-      )
-    );
-
-    setSelectedTask(null);
+    updateTaskMutation.mutate(updatedTask);
   };
 
-  // Delete a task
   const handleDeleteTask = (taskId) => {
-    setTasks((currentTasks) =>
-      currentTasks.filter(
-        (task) => task.id !== taskId
-      )
-    );
-
-    setSelectedTask(null);
-  };
-
-
-  const handleDragStart = (event) => {
-    console.log("Dragging task:", event.active.id);
+    deleteTaskMutation.mutate(taskId);
   };
 
   const handleDragEnd = (event) => {
     const { active, over } = event;
 
-    if (!over) return;
+    if (!over || active.id === over.id) {
+      return;
+    }
 
-    setTasks((currentTasks) => {
-      const activeIndex = currentTasks.findIndex(
-        (task) => task.id === active.id
-      );
+    const activeTask = tasks.find(
+      (task) => task._id === active.id
+    );
 
-      if (activeIndex === -1) {
-        return currentTasks;
+    if (!activeTask) {
+      return;
+    }
+
+    const targetColumn = kanbanColumns.find(
+      (column) => column.id === over.id
+    );
+
+    let updatedTasks = [...tasks];
+
+    // Dropped directly onto a column
+    if (targetColumn) {
+      if (activeTask.status === targetColumn.id) {
+        return;
       }
 
-      const activeTask = currentTasks[activeIndex];
-
-      // Check whether we dropped directly onto a column
-      const targetColumn = kanbanColumns.find(
-        (column) => column.id === over.id
+      updatedTasks = tasks.map((task) =>
+        task._id === active.id
+          ? {
+              ...task,
+              status: targetColumn.id,
+            }
+          : task
+      );
+    } else {
+      // Dropped onto another task
+      const overTask = tasks.find(
+        (task) => task._id === over.id
       );
 
-      if (targetColumn) {
-        // Already belongs to this column
-        if (activeTask.status === targetColumn.id) {
-          return currentTasks;
-        }
-
-        return currentTasks.map((task) =>
-          task.id === active.id
-            ? {
-                ...task,
-                status: targetColumn.id,
-              }
-            : task
-        );
+      if (!overTask) {
+        return;
       }
 
-      // Otherwise, we dropped over another task
-      const overIndex = currentTasks.findIndex(
-        (task) => task.id === over.id
+      const activeIndex = tasks.findIndex(
+        (task) => task._id === active.id
       );
 
-      if (overIndex === -1) {
-        return currentTasks;
-      }
+      const overIndex = tasks.findIndex(
+        (task) => task._id === over.id
+      );
 
-      const overTask = currentTasks[overIndex];
-
-      // Reordering inside the same column
       if (activeTask.status === overTask.status) {
-        return arrayMove(
-          currentTasks,
+        // Reorder tasks within the same column
+        updatedTasks = arrayMove(
+          tasks,
+          activeIndex,
+          overIndex
+        );
+      } else {
+        // Move task into another column
+        const tasksWithUpdatedStatus = tasks.map(
+          (task) =>
+            task._id === active.id
+              ? {
+                  ...task,
+                  status: overTask.status,
+                }
+              : task
+        );
+
+        updatedTasks = arrayMove(
+          tasksWithUpdatedStatus,
           activeIndex,
           overIndex
         );
       }
+    }
 
-      // Moving onto a task in another column
-      const updatedTasks = currentTasks.map((task) =>
-        task.id === active.id
-          ? {
-              ...task,
-              status: overTask.status,
-            }
-          : task
-      );
+    // Recalculate task positions inside each column
+    const tasksWithPositions = updatedTasks.map(
+      (task) => {
+        const columnTasks = updatedTasks.filter(
+          (columnTask) =>
+            columnTask.status === task.status
+        );
 
-      const updatedActiveIndex = updatedTasks.findIndex(
-        (task) => task.id === active.id
-      );
+        const position = columnTasks.findIndex(
+          (columnTask) =>
+            columnTask._id === task._id
+        );
 
-      const updatedOverIndex = updatedTasks.findIndex(
-        (task) => task.id === over.id
-      );
+        return {
+          ...task,
+          position,
+        };
+      }
+    );
 
-      return arrayMove(
-        updatedTasks,
-        updatedActiveIndex,
-        updatedOverIndex
-      );
-    });
+    // Optimistically update UI
+    queryClient.setQueryData(
+      ["tasks", projectId],
+      tasksWithPositions
+    );
+
+    // Persist new positions to MongoDB
+    reorderTasksMutation.mutate(
+      tasksWithPositions.map((task) => ({
+        _id: task._id,
+        status: task.status,
+        position: task.position,
+      }))
+    );
   };
 
   const sensors = useSensors(
-  useSensor(PointerSensor, {
-    activationConstraint: {
-      distance: 8,
-    },
-  })
-);
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
+
+  // Project loading state
+  if (isProjectLoading) {
+    return (
+      <div className="min-h-full bg-[#FFF3DF] p-4 md:p-8">
+        <p className="text-sm text-[#96796E]">
+          Loading project...
+        </p>
+      </div>
+    );
+  }
+
+  // Project error state
+  if (isProjectError) {
+    return (
+      <div className="min-h-full bg-[#FFF3DF] p-4 md:p-8">
+        <h1 className="text-2xl font-semibold text-[#4B302A]">
+          Unable to load project
+        </h1>
+
+        <p className="mt-2 text-sm text-[#96796E]">
+          The project could not be found or the
+          server is unavailable.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-full bg-[#FFF3DF] p-4 md:p-8">
       {/* Project Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        {/* Project Information */}
         <div>
           <p className="text-sm font-medium text-[#96796E]">
             Project
@@ -206,11 +328,11 @@ function ProjectBoard() {
           </h1>
 
           <p className="mt-2 text-sm text-[#96796E]">
-            Manage and track tasks across your project workflow.
+            {project?.description ||
+              "Manage and track tasks across your project workflow."}
           </p>
         </div>
 
-        {/* Add Task Button */}
         <button
           type="button"
           onClick={() => setIsTaskModalOpen(true)}
@@ -220,50 +342,77 @@ function ProjectBoard() {
         </button>
       </div>
 
-      {/* Kanban Board */}
-      <DndContext
-        sensors={sensors}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
-      <div className="mt-8">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {kanbanColumns.map((column) => {
-            const columnTasks = getTasksByStatus(column.id);
+      {/* Task Loading State */}
+      {areTasksLoading && (
+        <p className="mt-8 text-sm text-[#96796E]">
+          Loading tasks...
+        </p>
+      )}
 
-            return (
-              <KanbanColumn
-                key={column.id}
-                id={column.id}
-                title={column.title}
-                count={columnTasks.length}
-              >
-                <SortableContext
-                  items={columnTasks.map((task) => task.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  {columnTasks.map((task) => (
-                    <TaskCard
-                      key={task.id}
-                      id={task.id}
-                      title={task.title}
-                      description={task.description}
-                      priority={task.priority}
-                      dueDate={task.dueDate}
-                      onClick={() => setSelectedTask(task)}
-                    />
-                  ))}
-                </SortableContext>
-              </KanbanColumn>
-            );
-          })}
-        </div>
-      </div>
-          </DndContext>
+      {/* Task Error State */}
+      {areTasksError && (
+        <p className="mt-8 text-sm text-red-600">
+          Unable to load tasks. Please try again.
+        </p>
+      )}
+
+      {/* Kanban Board */}
+      {!areTasksLoading && !areTasksError && (
+        <DndContext
+          sensors={sensors}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="mt-8">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+              {kanbanColumns.map((column) => {
+                const columnTasks =
+                  getTasksByStatus(column.id);
+
+                return (
+                  <KanbanColumn
+                    key={column.id}
+                    id={column.id}
+                    title={column.title}
+                    count={columnTasks.length}
+                  >
+                    <SortableContext
+                      items={columnTasks.map(
+                        (task) => task._id
+                      )}
+                      strategy={
+                        verticalListSortingStrategy
+                      }
+                    >
+                      {columnTasks.map((task) => (
+                        <TaskCard
+                          key={task._id}
+                          id={task._id}
+                          title={task.title}
+                          description={
+                            task.description
+                          }
+                          priority={task.priority}
+                          dueDate={task.dueDate}
+                          onClick={() =>
+                            setSelectedTask(task)
+                          }
+                        />
+                      ))}
+                    </SortableContext>
+                  </KanbanColumn>
+                );
+              })}
+            </div>
+          </div>
+        </DndContext>
+      )}
+
       {/* Create Task Modal */}
       {isTaskModalOpen && (
         <TaskModal
-          onClose={() => setIsTaskModalOpen(false)}
+          onClose={() =>
+            setIsTaskModalOpen(false)
+          }
           onCreateTask={handleCreateTask}
         />
       )}

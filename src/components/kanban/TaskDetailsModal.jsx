@@ -33,7 +33,7 @@ const handleDelete = () => {
   );
 
   if (shouldDelete) {
-    onDeleteTask(task.id);
+    onDeleteTask(task._id);
   }
 };
 
