@@ -63,14 +63,14 @@ function Dashboard() {
       <div className="page-shell">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-600">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[color:var(--accent-strong)]">
               Dashboard
             </p>
-            <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+            <h1 className="mt-2 text-3xl font-bold tracking-tight text-[color:var(--text-primary)] sm:text-4xl">
               Welcome back{user?.name ? `, ${user.name.split(" ")[0]}` : ""}
             </h1>
 
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-[color:var(--text-secondary)]">
               Manage your projects, spot bottlenecks, and keep work moving from one focused place.
             </p>
           </div>
@@ -134,15 +134,15 @@ function Dashboard() {
         <section className="mt-10">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h2 className="text-2xl font-bold tracking-tight text-slate-950">
+              <h2 className="text-2xl font-bold tracking-tight text-[color:var(--text-primary)]">
                 Recent Projects
               </h2>
 
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-[color:var(--text-secondary)]">
                 Your recently active workspaces.
               </p>
             </div>
-            <p className="text-sm font-semibold text-slate-500">
+            <p className="text-sm font-semibold text-[color:var(--text-muted)]">
               {projects.length} {projects.length === 1 ? "project" : "projects"}
             </p>
           </div>
@@ -173,11 +173,11 @@ function Dashboard() {
           {!isLoading &&
             !isError &&
             projects.length === 0 && (
-              <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm">
-                <p className="text-base font-semibold text-slate-900">
+              <div className="mt-6 rounded-2xl border border-dashed border-[color:var(--border)] bg-[color:var(--card)] p-10 text-center shadow-sm">
+                <p className="text-base font-semibold text-[color:var(--text-primary)]">
                   No projects yet
                 </p>
-                <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
+                <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[color:var(--text-secondary)]">
                   Create your first project to collect tasks, due dates, and teammates in one board.
                 </p>
               </div>

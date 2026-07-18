@@ -1,0 +1,100 @@
+@keyframes theme-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes theme-blink {
+  0%,
+  94%,
+  100% {
+    transform: scaleY(1);
+  }
+
+  97% {
+    transform: scaleY(0.15);
+  }
+}
+
+@keyframes theme-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+  }
+
+  50% {
+    box-shadow: 0 0 22px color-mix(in srgb, var(--accent) 45%, transparent);
+  }
+}
+
+@keyframes theme-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.86);
+  }
+
+  20% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-26px) scale(0.96);
+  }
+}
+
+@keyframes theme-leaf {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+
+  50% {
+    transform: translate3d(8px, -7px, 0) rotate(12deg);
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+}
+
+@keyframes theme-pixel {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  50% {
+    transform: translate(0, -4px);
+  }
+}
+
+.theme-animate-float {
+  animation: theme-float 5.5s ease-in-out infinite;
+}
+
+.theme-animate-blink {
+  transform-origin: center;
+  animation: theme-blink 4.8s ease-in-out infinite;
+}
+
+.theme-animate-glow {
+  animation: theme-glow 2.8s ease-in-out infinite;
+}
+
+.theme-animate-leaf {
+  animation: theme-leaf 7s ease-in-out infinite;
+}
+
+.theme-animate-pixel {
+  animation: theme-pixel 1.1s steps(2, end) infinite;
+}
+
+.theme-celebration-pop {
+  animation: theme-pop 1.2s ease-out forwards;
+}

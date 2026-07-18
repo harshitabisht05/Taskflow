@@ -45,17 +45,17 @@ function Register() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/80 sm:p-8">
+    <div className="flex min-h-screen items-center justify-center bg-[color:var(--background)] px-4 py-10">
+      <div className="w-full max-w-md rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] p-6 shadow-xl sm:p-8">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-600">
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[color:var(--accent-strong)]">
             TaskFlow
           </p>
-          <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-950">
+          <h1 className="mt-3 text-3xl font-bold tracking-tight text-[color:var(--text-primary)]">
             Create your account
           </h1>
 
-          <p className="mt-2 text-sm leading-6 text-slate-500">
+          <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
             Start managing projects, tasks, and team handoffs in one place.
           </p>
         </div>
@@ -142,11 +142,11 @@ function Register() {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-slate-500">
+        <p className="mt-6 text-center text-sm text-[color:var(--text-secondary)]">
           Already have an account?{" "}
           <Link
             to="/login"
-            className="font-semibold text-teal-700 hover:text-teal-800 hover:underline"
+            className="font-semibold text-[color:var(--accent-strong)] hover:underline"
           >
             Log in
           </Link>

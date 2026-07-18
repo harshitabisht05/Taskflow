@@ -53,14 +53,14 @@ function CreateProjectModal({
       <div className="modal-panel max-w-lg">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-teal-600">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[color:var(--accent-strong)]">
               New Project
             </p>
-            <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-950">
+            <h2 className="mt-2 text-2xl font-bold tracking-tight text-[color:var(--text-primary)]">
               Create Project
             </h2>
 
-            <p className="mt-1 text-sm leading-6 text-slate-500">
+            <p className="mt-1 text-sm leading-6 text-[color:var(--text-secondary)]">
               Set up a workspace for tasks, deadlines, and collaboration.
             </p>
           </div>
@@ -170,7 +170,7 @@ function CreateProjectModal({
             </div>
           </div>
 
-          <p className="rounded-xl bg-slate-50 px-4 py-3 text-xs leading-5 text-slate-500">
+          <p className="rounded-xl border border-[color:var(--border)] bg-[color:var(--surface-hover)] px-4 py-3 text-xs leading-5 text-[color:var(--text-muted)]">
             {formData.projectType === "team"
               ? "Team projects let you add members and assign work."
               : "Personal projects stay private to your account."}

@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "./styles/themes.css";
+@import "./styles/theme-animations.css";
 
 :root {
   color: #172033;
@@ -18,15 +20,16 @@
 
 html {
   min-height: 100%;
-  background: #f6f8fb;
+  background: var(--background);
+  color: var(--text-primary);
 }
 
 body {
   min-height: 100vh;
   margin: 0;
-  background:
-    radial-gradient(circle at top left, rgba(20, 184, 166, 0.12), transparent 34rem),
-    linear-gradient(180deg, #f8fafc 0%, #eef3f8 100%);
+  background: var(--body-gradient);
+  color: var(--text-primary);
+  transition: background 180ms ease, color 180ms ease;
 }
 
 button,

@@ -33,14 +33,14 @@ function AddMemberModal({
       <div className="modal-panel max-w-md">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-teal-600">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[color:var(--accent-strong)]">
               Team
             </p>
-            <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-950">
+            <h2 className="mt-2 text-2xl font-bold tracking-tight text-[color:var(--text-primary)]">
               Add Team Member
             </h2>
 
-            <p className="mt-1 text-sm leading-6 text-slate-500">
+            <p className="mt-1 text-sm leading-6 text-[color:var(--text-secondary)]">
               Invite a registered TaskFlow user by email.
             </p>
           </div>

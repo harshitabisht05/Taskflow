@@ -30,6 +30,7 @@ import AddMemberModal from "../components/kanban/AddMemberModal";
 import EditProjectModal from "../components/kanban/EditProjectModal";
 
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../hooks/useTheme";
 
 import {
   getProjectById,
@@ -71,6 +72,7 @@ function ProjectBoard() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { triggerCelebration } = useTheme();
 
   const [isTaskModalOpen, setIsTaskModalOpen] =
     useState(false);
@@ -174,8 +176,12 @@ function ProjectBoard() {
         updatedTask
       ),
 
-    onSuccess: () => {
+    onSuccess: (_data, updatedTask) => {
       setTaskError("");
+
+      if (updatedTask?.status === "done") {
+        triggerCelebration("task-complete");
+      }
 
       queryClient.invalidateQueries({
         queryKey: ["tasks", projectId],
@@ -237,7 +243,11 @@ function ProjectBoard() {
         updatedTasks
       ),
 
-    onSuccess: () => {
+    onSuccess: (_data, updatedTasks) => {
+      if (updatedTasks?.some((task) => task.status === "done")) {
+        triggerCelebration("task-complete");
+      }
+
       queryClient.invalidateQueries({
         queryKey: ["dashboardStats"],
       });

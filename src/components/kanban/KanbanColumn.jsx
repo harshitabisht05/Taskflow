@@ -8,18 +8,16 @@ function KanbanColumn({ id, title, count, children }) {
   return (
     <section
       ref={setNodeRef}
-      className={`flex min-h-[24rem] w-full flex-col rounded-2xl border p-4 transition ${
-        isOver
-          ? "border-teal-300 bg-teal-50 shadow-md shadow-teal-100"
-          : "border-slate-200 bg-slate-50/80"
+      className={`theme-column flex min-h-[24rem] w-full flex-col border p-4 transition ${
+        isOver ? "theme-column-over" : ""
       }`}
     >
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm font-bold uppercase tracking-[0.14em] text-slate-600">
+        <h2 className="text-sm font-bold uppercase tracking-[0.14em] text-[color:var(--text-secondary)]">
           {title}
         </h2>
 
-        <span className="flex h-7 min-w-7 items-center justify-center rounded-full bg-white px-2 text-xs font-bold text-slate-700 ring-1 ring-slate-200">
+        <span className="theme-count flex h-7 min-w-7 items-center justify-center rounded-full border px-2 text-xs font-bold">
           {count}
         </span>
       </div>
@@ -28,8 +26,8 @@ function KanbanColumn({ id, title, count, children }) {
         {count > 0 ? (
           children
         ) : (
-          <div className="flex min-h-28 flex-1 items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white/70 p-5 text-center">
-            <p className="text-sm font-medium text-slate-400">
+          <div className="flex min-h-28 flex-1 items-center justify-center rounded-xl border border-dashed border-[color:var(--border)] bg-[color:var(--surface)]/70 p-5 text-center">
+            <p className="text-sm font-medium text-[color:var(--text-muted)]">
               No tasks yet
             </p>
           </div>

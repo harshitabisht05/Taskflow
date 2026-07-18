@@ -125,11 +125,11 @@ function TaskDetailsModal({
       <div className="modal-panel max-w-2xl">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-teal-600">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[color:var(--accent-strong)]">
               Task Details
             </p>
 
-            <h2 className="mt-2 break-words text-2xl font-bold tracking-tight text-slate-950">
+            <h2 className="mt-2 break-words text-2xl font-bold tracking-tight text-[color:var(--text-primary)]">
               {task.title}
             </h2>
           </div>
@@ -356,7 +356,7 @@ function TaskDetailsModal({
 
             {!isProjectLead &&
               isAssignedToCurrentUser && (
-                <p className="rounded-xl bg-slate-50 px-4 py-3 text-xs leading-5 text-slate-500">
+                <p className="rounded-xl border border-[color:var(--border)] bg-[color:var(--surface-hover)] px-4 py-3 text-xs leading-5 text-[color:var(--text-muted)]">
                   You can update the status of this task because it is assigned to you.
                 </p>
               )}
@@ -364,11 +364,11 @@ function TaskDetailsModal({
         ) : (
           <div className="mt-6 space-y-6">
             <div>
-              <p className="text-sm font-bold uppercase tracking-[0.14em] text-slate-400">
+              <p className="text-sm font-bold uppercase tracking-[0.14em] text-[color:var(--text-muted)]">
                 Description
               </p>
 
-              <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-700">
+              <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-[color:var(--text-secondary)]">
                 {task.description ||
                   "No description provided."}
               </p>
@@ -378,12 +378,12 @@ function TaskDetailsModal({
               {detailItems.map(([label, value]) => (
                 <div
                   key={label}
-                  className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                  className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-hover)] p-4"
                 >
-                  <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">
+                  <p className="text-xs font-bold uppercase tracking-[0.14em] text-[color:var(--text-muted)]">
                     {label}
                   </p>
-                  <p className="mt-2 text-sm font-semibold capitalize text-slate-900">
+                  <p className="mt-2 text-sm font-semibold capitalize text-[color:var(--text-primary)]">
                     {value}
                   </p>
                 </div>
@@ -391,24 +391,24 @@ function TaskDetailsModal({
             </div>
 
             {task.assignedTo && (
-              <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">
+              <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] p-4">
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-[color:var(--text-muted)]">
                   Assigned To
                 </p>
                 <div className="mt-3 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-100 text-sm font-bold text-teal-700">
+                  <div className="theme-avatar-soft flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold">
                     {task.assignedTo.name
                       ?.charAt(0)
                       .toUpperCase()}
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-slate-950">
+                    <p className="text-sm font-semibold text-[color:var(--text-primary)]">
                       {
                         task.assignedTo
                           .name
                       }
                     </p>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-[color:var(--text-muted)]">
                       {
                         task.assignedTo
                           .email
