@@ -29,25 +29,29 @@ function AddMemberModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#4B302A]/40 p-4 backdrop-blur-[2px]">
-      <div className="w-full max-w-md rounded-3xl border border-[#E2C4B8] bg-[#FFF9F2] p-6 shadow-xl">
-        <div className="flex items-start justify-between">
+    <div className="modal-backdrop">
+      <div className="modal-panel max-w-md">
+        <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-xl font-semibold text-[#4B302A]">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-teal-600">
+              Team
+            </p>
+            <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-950">
               Add Team Member
             </h2>
 
-            <p className="mt-1 text-sm text-[#96796E]">
-              Add a registered TaskFlow user by email.
+            <p className="mt-1 text-sm leading-6 text-slate-500">
+              Invite a registered TaskFlow user by email.
             </p>
           </div>
 
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg px-3 py-1 text-[#96796E] hover:bg-[#F8E3D7]"
+            className="icon-button"
+            aria-label="Close add member modal"
           >
-            ✕
+            x
           </button>
         </div>
 
@@ -57,7 +61,7 @@ function AddMemberModal({
         >
           <label
             htmlFor="member-email"
-            className="mb-2 block text-sm font-medium text-[#4B302A]"
+            className="label"
           >
             Member Email
           </label>
@@ -71,20 +75,20 @@ function AddMemberModal({
             }
             placeholder="member@example.com"
             required
-            className="w-full rounded-xl border border-[#D8B7A9] bg-white px-4 py-3 text-sm text-[#4B302A] outline-none focus:border-[#96796E]"
+            className="field"
           />
 
           {error && (
-            <p className="mt-2 text-sm text-red-600">
+            <div className="mt-3 error-box">
               {error}
-            </p>
+            </div>
           )}
 
           <div className="mt-6 flex justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl border border-[#D8B7A9] px-4 py-2.5 text-sm font-medium text-[#795D54] hover:bg-[#F8E3D7]"
+              className="btn-secondary"
             >
               Cancel
             </button>
@@ -92,7 +96,7 @@ function AddMemberModal({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-xl bg-[#4B302A] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#624139] disabled:cursor-not-allowed disabled:opacity-60"
+              className="btn-primary"
             >
               {isSubmitting
                 ? "Adding..."

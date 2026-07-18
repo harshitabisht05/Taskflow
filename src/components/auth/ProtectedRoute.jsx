@@ -9,8 +9,8 @@ function ProtectedRoute() {
 
   if (isAuthLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#FFF3DF]">
-        <p className="text-sm text-[#96796E]">
+      <div className="flex min-h-screen items-center justify-center bg-slate-100">
+        <p className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-500 shadow-sm ring-1 ring-slate-200">
           Loading...
         </p>
       </div>

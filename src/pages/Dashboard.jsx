@@ -24,7 +24,6 @@ function Dashboard() {
   const [isCreateProjectOpen, setIsCreateProjectOpen] =
     useState(false);
 
-  // Fetch all projects
   const {
     data: projects = [],
     isLoading,
@@ -34,7 +33,6 @@ function Dashboard() {
     queryFn: getProjects,
   });
 
-  // Create a new project
   const createProjectMutation = useMutation({
     mutationFn: createProject,
 
@@ -52,179 +50,182 @@ function Dashboard() {
   });
 
   const {
-  data: stats,
-  isLoading: areStatsLoading,
-  isError: areStatsError,
-} = useQuery({
-  queryKey: ["dashboardStats"],
-  queryFn: getDashboardStats,
-});
+    data: stats,
+    isLoading: areStatsLoading,
+    isError: areStatsError,
+  } = useQuery({
+    queryKey: ["dashboardStats"],
+    queryFn: getDashboardStats,
+  });
+
   return (
-    <div className="p-4 md:p-8">
-      {/* Dashboard Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-semibold text-[#4B302A]">
-            Dashboard
-          </h1>
+    <div className="app-page">
+      <div className="page-shell">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-600">
+              Dashboard
+            </p>
+            <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+              Welcome back{user?.name ? `, ${user.name.split(" ")[0]}` : ""}
+            </h1>
 
-          <p className="mt-1 text-sm text-[#96796E]">
-            Welcome to TaskFlow. Manage your projects and track your progress.
-          </p>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+              Manage your projects, spot bottlenecks, and keep work moving from one focused place.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() =>
+              setIsCreateProjectOpen(true)
+            }
+            className="btn-primary shrink-0"
+          >
+            <span aria-hidden="true">+</span>
+            New Project
+          </button>
         </div>
 
-        <button
-          type="button"
-          onClick={() =>
-            setIsCreateProjectOpen(true)
-          }
-          className="shrink-0 rounded-xl bg-[#4B302A] px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-[#624139]"
-        >
-          + New Project
-        </button>
-      </div>
+        <section className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <StatCard
+            title="Total Projects"
+            value={
+              areStatsLoading
+                ? "..."
+                : stats?.totalProjects ?? 0
+            }
+          />
 
-      {/* Statistics */}
-      <section className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-  title="Total Projects"
-  value={
-    areStatsLoading
-      ? "..."
-      : stats?.totalProjects ?? 0
-  }
-/>
+          <StatCard
+            title="Total Tasks"
+            value={
+              areStatsLoading
+                ? "..."
+                : stats?.totalTasks ?? 0
+            }
+          />
 
-<StatCard
-  title="Total Tasks"
-  value={
-    areStatsLoading
-      ? "..."
-      : stats?.totalTasks ?? 0
-  }
-/>
+          <StatCard
+            title="Completed Tasks"
+            value={
+              areStatsLoading
+                ? "..."
+                : stats?.completedTasks ?? 0
+            }
+          />
 
-<StatCard
-  title="Completed Tasks"
-  value={
-    areStatsLoading
-      ? "..."
-      : stats?.completedTasks ?? 0
-  }
-/>
+          <StatCard
+            title="In Progress"
+            value={
+              areStatsLoading
+                ? "..."
+                : stats?.inProgressTasks ?? 0
+            }
+          />
+        </section>
 
-<StatCard
-  title="In Progress"
-  value={
-    areStatsLoading
-      ? "..."
-      : stats?.inProgressTasks ?? 0
-  }
-/>
-{areStatsError && (
-  <p className="mt-3 text-sm text-red-600">
-    Unable to load dashboard statistics.
-  </p>
-)}
-      </section>
-
-      {/* Recent Projects */}
-      <section className="mt-10">
-        <div>
-          <h2 className="text-2xl font-semibold text-[#4B302A]">
-            Recent Projects
-          </h2>
-
-          <p className="mt-1 text-sm text-[#96796E]">
-            Your recently active projects.
-          </p>
-        </div>
-
-        {/* Loading State */}
-        {isLoading && (
-          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {[1, 2, 3].map((item) => (
-              <div
-                key={item}
-                className="animate-pulse rounded-2xl border border-[#E2C4B8] bg-[#FFF9F2] p-5"
-              >
-                <div className="h-5 w-2/3 rounded bg-[#E2C4B8]" />
-
-                <div className="mt-4 h-3 w-full rounded bg-[#F1E5DD]" />
-
-                <div className="mt-2 h-3 w-4/5 rounded bg-[#F1E5DD]" />
-
-                <div className="mt-6 h-2 w-full rounded-full bg-[#E2C4B8]" />
-
-                <div className="mt-4 h-4 w-1/3 rounded bg-[#F1E5DD]" />
-              </div>
-            ))}
+        {areStatsError && (
+          <div className="mt-4 error-box">
+            Unable to load dashboard statistics.
           </div>
         )}
 
-        {/* Error State */}
-        {isError && (
-          <p className="mt-6 text-sm text-red-600">
-            Unable to load projects. Please try again.
-          </p>
-        )}
+        <section className="mt-10">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight text-slate-950">
+                Recent Projects
+              </h2>
 
-        {/* Empty State */}
-        {!isLoading &&
-          !isError &&
-          projects.length === 0 && (
-            <div className="mt-6 rounded-2xl border border-dashed border-[#D8B7A9] bg-[#FFF9F2] p-8 text-center">
-              <p className="text-sm text-[#96796E]">
-                No projects found. Create your first project to get started.
+              <p className="mt-1 text-sm text-slate-500">
+                Your recently active workspaces.
               </p>
             </div>
-          )}
+            <p className="text-sm font-semibold text-slate-500">
+              {projects.length} {projects.length === 1 ? "project" : "projects"}
+            </p>
+          </div>
 
-        {/* Project Cards */}
-        {!isLoading &&
-          !isError &&
-          projects.length > 0 && (
+          {isLoading && (
             <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {projects.map((project) => (
-                <ProjectCard
-                  key={project._id}
-                  id={project._id}
-                  name={project.name}
-                  description={project.description}
-                  status={project.status}
-                  dueDate={project.dueDate}
-                  projectType={project.projectType}
-                  totalTasks={project.totalTasks}
-                  completedTasks={project.completedTasks}
-                  role={
-                    project.projectType === "team"
-                      ? project.owner?._id === user?._id
-                        ? "Team Lead"
-                        : "Team Member"
-                      : "Personal"
-                  }
-                />
+              {[1, 2, 3].map((item) => (
+                <div
+                  key={item}
+                  className="panel animate-pulse p-5"
+                >
+                  <div className="h-5 w-2/3 rounded bg-slate-200" />
+                  <div className="mt-4 h-3 w-full rounded bg-slate-100" />
+                  <div className="mt-2 h-3 w-4/5 rounded bg-slate-100" />
+                  <div className="mt-6 h-2 w-full rounded-full bg-slate-200" />
+                  <div className="mt-4 h-4 w-1/3 rounded bg-slate-100" />
+                </div>
               ))}
             </div>
           )}
-      </section>
 
-      {/* Create Project Modal */}
-      {isCreateProjectOpen && (
-        <CreateProjectModal
-          onClose={() =>
-            setIsCreateProjectOpen(false)
-          }
-          onCreateProject={(projectData) =>
-            createProjectMutation.mutateAsync(
-              projectData
-            )
-          }
-          isSubmitting={
-            createProjectMutation.isPending
-          }
-        />
-      )}
+          {isError && (
+            <div className="mt-6 error-box">
+              Unable to load projects. Please try again.
+            </div>
+          )}
+
+          {!isLoading &&
+            !isError &&
+            projects.length === 0 && (
+              <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm">
+                <p className="text-base font-semibold text-slate-900">
+                  No projects yet
+                </p>
+                <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
+                  Create your first project to collect tasks, due dates, and teammates in one board.
+                </p>
+              </div>
+            )}
+
+          {!isLoading &&
+            !isError &&
+            projects.length > 0 && (
+              <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {projects.map((project) => (
+                  <ProjectCard
+                    key={project._id}
+                    id={project._id}
+                    name={project.name}
+                    description={project.description}
+                    status={project.status}
+                    dueDate={project.dueDate}
+                    totalTasks={project.totalTasks}
+                    completedTasks={project.completedTasks}
+                    role={
+                      project.projectType === "team"
+                        ? project.owner?._id === user?._id
+                          ? "Team Lead"
+                          : "Team Member"
+                        : "Personal"
+                    }
+                  />
+                ))}
+              </div>
+            )}
+        </section>
+
+        {isCreateProjectOpen && (
+          <CreateProjectModal
+            onClose={() =>
+              setIsCreateProjectOpen(false)
+            }
+            onCreateProject={(projectData) =>
+              createProjectMutation.mutateAsync(
+                projectData
+              )
+            }
+            isSubmitting={
+              createProjectMutation.isPending
+            }
+          />
+        )}
+      </div>
     </div>
   );
 }

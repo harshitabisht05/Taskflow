@@ -5,51 +5,61 @@ import { useAuth } from "../../context/AuthContext";
 
 function Sidebar() {
   const navigate = useNavigate();
-const queryClient = useQueryClient();
-const { logout } = useAuth();
+  const queryClient = useQueryClient();
+  const { logout } = useAuth();
 
-const handleLogout = () => {
-  logout();
+  const handleLogout = () => {
+    logout();
 
-  queryClient.clear();
+    queryClient.clear();
 
-  navigate("/login", {
-    replace: true,
-  });
-};
+    navigate("/login", {
+      replace: true,
+    });
+  };
 
   return (
-    <aside className="min-h-screen w-20 shrink-0 bg-[#96796E] px-3 py-7 text-[#FFF4E3] md:w-64 md:px-5">
-      {/* Brand */}
-      <div className="mb-20 px-1 md:px-3">
-        <h1 className="text-center text-xl font-medium tracking-wide md:text-left md:text-4xl">
-          <span className="md:hidden">TF</span>
-          <span className="hidden md:inline">TaskFlow</span>
-        </h1>
+    <aside className="sticky top-0 flex h-screen w-20 shrink-0 flex-col border-r border-slate-800 bg-slate-950 px-3 py-5 text-white md:w-68 md:px-5">
+      <div className="mb-8 flex items-center justify-center gap-3 md:justify-start">
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-500 text-sm font-black text-slate-950">
+          TF
+        </div>
+        <div className="hidden md:block">
+          <h1 className="text-xl font-bold tracking-tight">
+            TaskFlow
+          </h1>
+          <p className="text-xs font-medium text-slate-400">
+            Plan, assign, ship
+          </p>
+        </div>
       </div>
 
-      {/* Navigation */}
       <nav className="space-y-2">
         <NavLink
           to="/dashboard"
           className={({ isActive }) =>
-            `block rounded-2xl px-3 py-3 text-center text-sm font-medium transition-colors md:text-left md:text-xl ${
+            `flex items-center justify-center gap-3 rounded-2xl px-3 py-3 text-sm font-semibold transition md:justify-start ${
               isActive
-                ? "bg-[#EDB7A6] text-[#4B302A]"
-                : "text-[#FFF4E3] hover:bg-[#A98A7E]"
+                ? "bg-white text-slate-950 shadow-sm"
+                : "text-slate-300 hover:bg-white/10 hover:text-white"
             }`
           }
         >
-          <span className="md:hidden">D</span>
+          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-current/10 text-sm">
+            D
+          </span>
           <span className="hidden md:inline">Dashboard</span>
         </NavLink>
       </nav>
+
       <button
-  type="button"
-  onClick={handleLogout}
->
-  Logout
-</button>
+        type="button"
+        onClick={handleLogout}
+        className="mt-auto flex items-center justify-center rounded-2xl border border-white/10 px-3 py-3 text-sm font-semibold text-slate-300 transition hover:bg-white/10 hover:text-white md:justify-start"
+      >
+        <span className="md:hidden">Out</span>
+        <span className="hidden md:inline">Logout</span>
+      </button>
     </aside>
   );
 }

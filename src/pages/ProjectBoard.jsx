@@ -72,60 +72,48 @@ function ProjectBoard() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  // Modal state
   const [isTaskModalOpen, setIsTaskModalOpen] =
     useState(false);
-
   const [
     isEditProjectOpen,
     setIsEditProjectOpen,
   ] = useState(false);
-
   const [
     isAddMemberModalOpen,
     setIsAddMemberModalOpen,
   ] = useState(false);
-
   const [selectedTask, setSelectedTask] =
     useState(null);
 
-  // Filter state
   const [searchQuery, setSearchQuery] =
     useState("");
-
   const [
     priorityFilter,
     setPriorityFilter,
   ] = useState("all");
-
   const [
     statusFilter,
     setStatusFilter,
   ] = useState("all");
-
   const [
     dueDateFilter,
     setDueDateFilter,
   ] = useState("all");
 
-  // Error state
   const [
     removeMemberError,
     setRemoveMemberError,
   ] = useState("");
-
   const [
     projectUpdateError,
     setProjectUpdateError,
   ] = useState("");
-
   const [
     deleteProjectError,
     setDeleteProjectError,
   ] = useState("");
-
   const [taskError, setTaskError] = useState("");
-  // Fetch current project
+
   const {
     data: project,
     isLoading: isProjectLoading,
@@ -137,11 +125,9 @@ function ProjectBoard() {
     enabled: Boolean(projectId),
   });
 
-  // Check whether current user is project owner / team lead
   const isProjectLead =
     project?.owner?._id === user?._id;
 
-  // Fetch project tasks
   const {
     data: tasks = [],
     isLoading: areTasksLoading,
@@ -152,108 +138,98 @@ function ProjectBoard() {
     enabled: Boolean(projectId),
   });
 
-// Create task
-const createTaskMutation = useMutation({
-  mutationFn: (taskData) =>
-    createTask(projectId, taskData),
+  const createTaskMutation = useMutation({
+    mutationFn: (taskData) =>
+      createTask(projectId, taskData),
 
-  onSuccess: () => {
-    setTaskError("");
+    onSuccess: () => {
+      setTaskError("");
 
-    queryClient.invalidateQueries({
-      queryKey: ["tasks", projectId],
-    });
+      queryClient.invalidateQueries({
+        queryKey: ["tasks", projectId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["dashboardStats"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["projects"],
+      });
 
-    queryClient.invalidateQueries({
-      queryKey: ["dashboardStats"],
-    });
+      setIsTaskModalOpen(false);
+    },
 
-    queryClient.invalidateQueries({
-      queryKey: ["projects"],
-    });
+    onError: (error) => {
+      setTaskError(
+        error.response?.data?.message ||
+          "Unable to create task. Please try again."
+      );
+    },
+  });
 
-    setIsTaskModalOpen(false);
-  },
+  const updateTaskMutation = useMutation({
+    mutationFn: (updatedTask) =>
+      updateTask(
+        projectId,
+        updatedTask._id,
+        updatedTask
+      ),
 
-  onError: (error) => {
-    setTaskError(
-      error.response?.data?.message ||
-        "Unable to create task. Please try again."
-    );
-  },
-});
+    onSuccess: () => {
+      setTaskError("");
 
-// Update task
-const updateTaskMutation = useMutation({
-  mutationFn: (updatedTask) =>
-    updateTask(
-      projectId,
-      updatedTask._id,
-      updatedTask
-    ),
+      queryClient.invalidateQueries({
+        queryKey: ["tasks", projectId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["dashboardStats"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["projects"],
+      });
 
-  onSuccess: () => {
-    setTaskError("");
+      setSelectedTask(null);
+    },
 
-    queryClient.invalidateQueries({
-      queryKey: ["tasks", projectId],
-    });
+    onError: (error) => {
+      setTaskError(
+        error.response?.data?.message ||
+          "Unable to update task. Please try again."
+      );
 
-    queryClient.invalidateQueries({
-      queryKey: ["dashboardStats"],
-    });
+      queryClient.invalidateQueries({
+        queryKey: ["tasks", projectId],
+      });
+    },
+  });
 
-    queryClient.invalidateQueries({
-      queryKey: ["projects"],
-    });
+  const deleteTaskMutation = useMutation({
+    mutationFn: (taskId) =>
+      deleteTask(projectId, taskId),
 
-    setSelectedTask(null);
-  },
+    onSuccess: () => {
+      setTaskError("");
 
-  onError: (error) => {
-    setTaskError(
-      error.response?.data?.message ||
-        "Unable to update task. Please try again."
-    );
+      queryClient.invalidateQueries({
+        queryKey: ["tasks", projectId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["dashboardStats"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["projects"],
+      });
 
-    queryClient.invalidateQueries({
-      queryKey: ["tasks", projectId],
-    });
-  },
-});
+      setSelectedTask(null);
+    },
 
-// Delete task
-const deleteTaskMutation = useMutation({
-  mutationFn: (taskId) =>
-    deleteTask(projectId, taskId),
+    onError: (error) => {
+      setTaskError(
+        error.response?.data?.message ||
+          "Unable to delete task. Please try again."
+      );
+    },
+  });
 
-  onSuccess: () => {
-    setTaskError("");
-
-    queryClient.invalidateQueries({
-      queryKey: ["tasks", projectId],
-    });
-
-    queryClient.invalidateQueries({
-      queryKey: ["dashboardStats"],
-    });
-
-    queryClient.invalidateQueries({
-      queryKey: ["projects"],
-    });
-
-    setSelectedTask(null);
-  },
-
-  onError: (error) => {
-    setTaskError(
-      error.response?.data?.message ||
-        "Unable to delete task. Please try again."
-    );
-  },
-});
-
-  // Persist drag-and-drop ordering
   const reorderTasksMutation = useMutation({
     mutationFn: (updatedTasks) =>
       reorderTasks(
@@ -265,7 +241,6 @@ const deleteTaskMutation = useMutation({
       queryClient.invalidateQueries({
         queryKey: ["dashboardStats"],
       });
-
       queryClient.invalidateQueries({
         queryKey: ["projects"],
       });
@@ -278,7 +253,6 @@ const deleteTaskMutation = useMutation({
     },
   });
 
-  // Add team member
   const addMemberMutation = useMutation({
     mutationFn: (email) =>
       addProjectMember(
@@ -293,7 +267,6 @@ const deleteTaskMutation = useMutation({
           projectId,
         ],
       });
-
       queryClient.invalidateQueries({
         queryKey: ["projects"],
       });
@@ -302,7 +275,6 @@ const deleteTaskMutation = useMutation({
     },
   });
 
-  // Remove team member
   const removeMemberMutation = useMutation({
     mutationFn: (memberId) =>
       removeProjectMember(
@@ -319,7 +291,6 @@ const deleteTaskMutation = useMutation({
           projectId,
         ],
       });
-
       queryClient.invalidateQueries({
         queryKey: ["projects"],
       });
@@ -333,7 +304,6 @@ const deleteTaskMutation = useMutation({
     },
   });
 
-  // Update project
   const updateProjectMutation = useMutation({
     mutationFn: (projectData) =>
       updateProject(
@@ -350,11 +320,9 @@ const deleteTaskMutation = useMutation({
           projectId,
         ],
       });
-
       queryClient.invalidateQueries({
         queryKey: ["projects"],
       });
-
       queryClient.invalidateQueries({
         queryKey: ["dashboardStats"],
       });
@@ -370,7 +338,6 @@ const deleteTaskMutation = useMutation({
     },
   });
 
-  // Delete project
   const deleteProjectMutation = useMutation({
     mutationFn: () =>
       deleteProject(projectId),
@@ -384,18 +351,15 @@ const deleteTaskMutation = useMutation({
           projectId,
         ],
       });
-
       queryClient.removeQueries({
         queryKey: [
           "tasks",
           projectId,
         ],
       });
-
       queryClient.invalidateQueries({
         queryKey: ["projects"],
       });
-
       queryClient.invalidateQueries({
         queryKey: ["dashboardStats"],
       });
@@ -411,7 +375,6 @@ const deleteTaskMutation = useMutation({
     },
   });
 
-  // Clear all task filters
   const handleClearFilters = () => {
     setSearchQuery("");
     setPriorityFilter("all");
@@ -419,7 +382,6 @@ const deleteTaskMutation = useMutation({
     setDueDateFilter("all");
   };
 
-  // Remove project member
   const handleRemoveMember = (member) => {
     const shouldRemove =
       window.confirm(
@@ -431,13 +393,11 @@ const deleteTaskMutation = useMutation({
     }
 
     setRemoveMemberError("");
-
     removeMemberMutation.mutate(
       member.user._id
     );
   };
 
-  // Filter tasks
   const getTasksByStatus = (status) => {
     return tasks.filter((task) => {
       const matchesStatus =
@@ -449,6 +409,7 @@ const deleteTaskMutation = useMutation({
           .toLowerCase();
 
       const matchesSearch =
+        !normalizedSearch ||
         task.title
           ?.toLowerCase()
           .includes(
@@ -493,25 +454,22 @@ const deleteTaskMutation = useMutation({
     });
   };
 
-const handleCreateTask = (formData) => {
-  setTaskError("");
-  createTaskMutation.mutate(formData);
-};
+  const handleCreateTask = (formData) => {
+    setTaskError("");
+    createTaskMutation.mutate(formData);
+  };
 
-const handleUpdateTask = (updatedTask) => {
-  setTaskError("");
-  updateTaskMutation.mutate(updatedTask);
-};
+  const handleUpdateTask = (updatedTask) => {
+    setTaskError("");
+    updateTaskMutation.mutate(updatedTask);
+  };
 
-const handleDeleteTask = (taskId) => {
-  setTaskError("");
-  deleteTaskMutation.mutate(taskId);
-};
+  const handleDeleteTask = (taskId) => {
+    setTaskError("");
+    deleteTaskMutation.mutate(taskId);
+  };
 
-  // Drag and drop
   const handleDragEnd = (event) => {
-    // Disable drag and drop while
-    // filtering by status
     if (statusFilter !== "all") {
       return;
     }
@@ -538,8 +496,6 @@ const handleDeleteTask = (taskId) => {
       activeTask.assignedTo?._id ===
       user?._id;
 
-    // Team members can only move
-    // tasks assigned to them
     if (
       project?.projectType ===
         "team" &&
@@ -557,7 +513,6 @@ const handleDeleteTask = (taskId) => {
 
     let updatedTasks = [...tasks];
 
-    // Dropped directly onto a column
     if (targetColumn) {
       if (
         activeTask.status ===
@@ -577,7 +532,6 @@ const handleDeleteTask = (taskId) => {
             : task
       );
     } else {
-      // Dropped onto another task
       const overTask = tasks.find(
         (task) =>
           task._id === over.id
@@ -603,8 +557,6 @@ const handleDeleteTask = (taskId) => {
         activeTask.status ===
         overTask.status
       ) {
-        // Only project lead can
-        // reorder inside same column
         if (!isProjectLead) {
           return;
         }
@@ -615,7 +567,6 @@ const handleDeleteTask = (taskId) => {
           overIndex
         );
       } else {
-        // Move task into another column
         const tasksWithUpdatedStatus =
           tasks.map((task) =>
             task._id === active.id
@@ -635,7 +586,6 @@ const handleDeleteTask = (taskId) => {
       }
     }
 
-    // Recalculate positions
     const tasksWithPositions =
       updatedTasks.map((task) => {
         const columnTasks =
@@ -658,14 +608,11 @@ const handleDeleteTask = (taskId) => {
         };
       });
 
-    // Optimistic UI update
     queryClient.setQueryData(
       ["tasks", projectId],
       tasksWithPositions
     );
 
-    // Project lead can persist
-    // full ordering
     if (isProjectLead) {
       reorderTasksMutation.mutate(
         tasksWithPositions.map(
@@ -681,8 +628,6 @@ const handleDeleteTask = (taskId) => {
       return;
     }
 
-    // Team member can update
-    // only their assigned task
     const movedTask =
       tasksWithPositions.find(
         (task) =>
@@ -700,7 +645,6 @@ const handleDeleteTask = (taskId) => {
     });
   };
 
-  // Delete project
   const handleDeleteProject = () => {
     const shouldDelete =
       window.confirm(
@@ -711,9 +655,7 @@ const handleDeleteTask = (taskId) => {
       return;
     }
 
-    // Clear previous deletion error
     setDeleteProjectError("");
-
     deleteProjectMutation.mutate();
   };
 
@@ -725,7 +667,6 @@ const handleDeleteTask = (taskId) => {
     })
   );
 
-  // Visible Kanban columns
   const visibleColumns =
     statusFilter === "all"
       ? kanbanColumns
@@ -735,10 +676,8 @@ const handleDeleteTask = (taskId) => {
             statusFilter
         );
 
-  // Project progress
   const totalProjectTasks =
     tasks.length;
-
   const completedProjectTasks =
     tasks.filter(
       (task) =>
@@ -754,7 +693,6 @@ const handleDeleteTask = (taskId) => {
         )
       : 0;
 
-  // Project due date
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -768,431 +706,423 @@ const handleDeleteTask = (taskId) => {
     projectDueDate < today &&
     project?.status !== "completed";
 
-  // Project loading state
+  const filtersAreActive =
+    searchQuery ||
+    priorityFilter !== "all" ||
+    statusFilter !== "all" ||
+    dueDateFilter !== "all";
+
   if (isProjectLoading) {
     return (
-      <div className="min-h-full bg-[#FFF3DF] p-4 md:p-8">
-        <p className="text-sm text-[#96796E]">
-          Loading project...
-        </p>
+      <div className="app-page">
+        <div className="page-shell">
+          <div className="panel animate-pulse p-6">
+            <div className="h-6 w-48 rounded bg-slate-200" />
+            <div className="mt-4 h-4 w-2/3 rounded bg-slate-100" />
+            <div className="mt-8 h-2 w-80 max-w-full rounded-full bg-slate-200" />
+          </div>
+        </div>
       </div>
     );
   }
 
-  // Project error state
   if (isProjectError) {
     return (
-      <div className="min-h-full bg-[#FFF3DF] p-4 md:p-8">
-        <h1 className="text-2xl font-semibold text-[#4B302A]">
-          Unable to load project
-        </h1>
+      <div className="app-page">
+        <div className="page-shell">
+          <div className="panel p-8">
+            <h1 className="text-2xl font-bold text-slate-950">
+              Unable to load project
+            </h1>
 
-        <p className="mt-2 text-sm text-[#96796E]">
-          The project could not be
-          found or the server is
-          unavailable.
-        </p>
+            <p className="mt-2 text-sm leading-6 text-slate-500">
+              The project could not be found or the server is unavailable.
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-full bg-[#FFF3DF] p-4 md:p-8">
-      {/* Project Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        {/* Project Information */}
-        <div>
-          <p className="text-sm font-medium text-[#96796E]">
-            Project
-          </p>
+    <div className="app-page">
+      <div className="page-shell">
+        <section className="panel overflow-hidden">
+          <div className="border-b border-slate-100 p-5 sm:p-6">
+            <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-full bg-teal-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-teal-700 ring-1 ring-teal-100">
+                    {project?.projectType === "team"
+                      ? "Team Project"
+                      : "Personal Project"}
+                  </span>
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold capitalize text-slate-600">
+                    {project?.status}
+                  </span>
+                </div>
 
-          <h1 className="mt-1 text-3xl font-semibold text-[#4B302A]">
-            {project?.name ??
-              "Project Board"}
-          </h1>
+                <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+                  {project?.name ??
+                    "Project Board"}
+                </h1>
 
-          <p className="mt-2 text-sm text-[#96796E]">
-            {project?.description ||
-              "Manage and track tasks across your project workflow."}
-          </p>
+                <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-500">
+                  {project?.description ||
+                    "Manage and track tasks across your project workflow."}
+                </p>
 
-          {/* Project Due Date */}
-          {projectDueDate && (
-            <p
-              className={`mt-2 text-sm ${
-                isProjectOverdue
-                  ? "font-medium text-red-600"
-                  : "text-[#96796E]"
-              }`}
-            >
-              {isProjectOverdue
-                ? "Overdue: "
-                : "Due: "}
-
-              {projectDueDate.toLocaleDateString()}
-            </p>
-          )}
-
-          {/* Project Progress */}
-          <div className="mt-4 max-w-sm">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-medium text-[#795D54]">
-                Project Progress
-              </span>
-
-              <span className="text-[#96796E]">
-                {projectProgress}%
-              </span>
-            </div>
-
-            <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#E2C4B8]">
-              <div
-                className="h-full rounded-full bg-[#4B302A] transition-all duration-300"
-                style={{
-                  width: `${projectProgress}%`,
-                }}
-              />
-            </div>
-
-            <p className="mt-1 text-xs text-[#96796E]">
-              {completedProjectTasks}{" "}
-              of {totalProjectTasks}{" "}
-              tasks completed
-            </p>
-          </div>
-
-          {project?.projectType ===
-            "team" && (
-            <p className="mt-2 text-xs font-medium uppercase tracking-wide text-[#96796E]">
-              Team Project
-            </p>
-          )}
-        </div>
-
-        {/* Project Actions */}
-        <div className="flex shrink-0 flex-wrap gap-3">
-          {/* Edit Project */}
-          {isProjectLead && (
-            <button
-              type="button"
-              onClick={() => {
-                setProjectUpdateError(
-                  ""
-                );
-                setIsEditProjectOpen(
-                  true
-                );
-              }}
-              className="rounded-xl border border-[#4B302A] px-5 py-2.5 text-sm font-medium text-[#4B302A] transition hover:bg-[#F8E3D7]"
-            >
-              Edit Project
-            </button>
-          )}
-
-          {/* Delete Project */}
-          {isProjectLead && (
-            <button
-              type="button"
-              onClick={
-                handleDeleteProject
-              }
-              disabled={
-                deleteProjectMutation.isPending
-              }
-              className="rounded-xl border border-red-300 px-5 py-2.5 text-sm font-medium text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {deleteProjectMutation.isPending
-                ? "Deleting..."
-                : "Delete Project"}
-            </button>
-          )}
-
-          {/* Add Member */}
-          {project?.projectType ===
-            "team" &&
-            isProjectLead && (
-              <button
-                type="button"
-                onClick={() =>
-                  setIsAddMemberModalOpen(
-                    true
-                  )
-                }
-                className="rounded-xl border border-[#4B302A] px-5 py-2.5 text-sm font-medium text-[#4B302A] transition hover:bg-[#F8E3D7]"
-              >
-                + Add Member
-              </button>
-            )}
-
-          {/* Add Task */}
-          {isProjectLead && (
-            <button
-              type="button"
-              onClick={() => {
-                setTaskError("");
-                setIsTaskModalOpen(true);
-              }}
-              className="rounded-xl bg-[#4B302A] px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-[#624139] hover:shadow-md"
-            >
-              + Add Task
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Delete Project Error */}
-      {deleteProjectError && (
-        <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
-          <p className="text-sm text-red-700">
-            {deleteProjectError}
-          </p>
-        </div>
-      )}
-
-      {/* Team Members */}
-      {project?.projectType ===
-        "team" && (
-        <div className="mt-6 rounded-2xl border border-[#E2C4B8] bg-[#FFF9F2] p-5">
-          <h2 className="text-lg font-semibold text-[#4B302A]">
-            Team
-          </h2>
-
-          {/* Team Lead */}
-          <div className="mt-4">
-            <p className="text-xs font-medium uppercase tracking-wide text-[#96796E]">
-              Team Lead
-            </p>
-
-            <p className="mt-1 text-sm font-medium text-[#4B302A]">
-              {project.owner?.name}
-            </p>
-
-            <p className="text-xs text-[#96796E]">
-              {project.owner?.email}
-            </p>
-          </div>
-
-          {/* Team Members */}
-          <div className="mt-4">
-            <p className="text-xs font-medium uppercase tracking-wide text-[#96796E]">
-              Members
-            </p>
-
-            {project.members
-              ?.length > 0 ? (
-              <div className="mt-2 flex flex-wrap gap-2">
-                {project.members.map(
-                  (member) => (
-                    <div
-                      key={
-                        member.user._id
-                      }
-                      className="flex items-center gap-4 rounded-xl border border-[#E2C4B8] bg-white px-3 py-2"
-                    >
-                      <div>
-                        <p className="text-sm font-medium text-[#4B302A]">
-                          {
-                            member.user
-                              .name
-                          }
-                        </p>
-
-                        <p className="text-xs text-[#96796E]">
-                          {
-                            member.user
-                              .email
-                          }
-                        </p>
-                      </div>
-
-                      {isProjectLead && (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleRemoveMember(
-                              member
-                            )
-                          }
-                          disabled={
-                            removeMemberMutation.isPending
-                          }
-                          className="ml-auto text-xs font-medium text-red-600 transition hover:text-red-800 disabled:opacity-50"
-                        >
-                          Remove
-                        </button>
-                      )}
-                    </div>
-                  )
-                )}
-
-                {removeMemberError && (
-                  <p className="w-full text-sm text-red-600">
-                    {
-                      removeMemberError
-                    }
+                {projectDueDate && (
+                  <p
+                    className={`mt-3 text-sm font-semibold ${
+                      isProjectOverdue
+                        ? "text-rose-600"
+                        : "text-slate-500"
+                    }`}
+                  >
+                    {isProjectOverdue
+                      ? "Overdue: "
+                      : "Due: "}
+                    {projectDueDate.toLocaleDateString()}
                   </p>
                 )}
               </div>
-            ) : (
-              <p className="mt-2 text-sm text-[#96796E]">
-                No team members added
-                yet.
+
+              <div className="flex shrink-0 flex-wrap gap-3">
+                {isProjectLead && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProjectUpdateError(
+                        ""
+                      );
+                      setIsEditProjectOpen(
+                        true
+                      );
+                    }}
+                    className="btn-secondary"
+                  >
+                    Edit Project
+                  </button>
+                )}
+
+                {isProjectLead && (
+                  <button
+                    type="button"
+                    onClick={
+                      handleDeleteProject
+                    }
+                    disabled={
+                      deleteProjectMutation.isPending
+                    }
+                    className="btn-danger"
+                  >
+                    {deleteProjectMutation.isPending
+                      ? "Deleting..."
+                      : "Delete"}
+                  </button>
+                )}
+
+                {project?.projectType ===
+                  "team" &&
+                  isProjectLead && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setIsAddMemberModalOpen(
+                          true
+                        )
+                      }
+                      className="btn-secondary"
+                    >
+                      Add Member
+                    </button>
+                  )}
+
+                {isProjectLead && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTaskError("");
+                      setIsTaskModalOpen(true);
+                    }}
+                    className="btn-primary"
+                  >
+                    <span aria-hidden="true">+</span>
+                    Add Task
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_20rem]">
+            <div className="p-5 sm:p-6">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold uppercase tracking-[0.14em] text-slate-400">
+                  Project Progress
+                </span>
+                <span className="font-bold text-slate-900">
+                  {projectProgress}%
+                </span>
+              </div>
+
+              <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className="h-full rounded-full bg-teal-500 transition-all duration-300"
+                  style={{
+                    width: `${projectProgress}%`,
+                  }}
+                />
+              </div>
+
+              <p className="mt-2 text-xs font-medium text-slate-500">
+                {completedProjectTasks} of {totalProjectTasks} tasks completed
               </p>
+            </div>
+
+            {project?.projectType ===
+              "team" && (
+              <aside className="border-t border-slate-100 p-5 sm:p-6 lg:border-l lg:border-t-0">
+                <h2 className="text-sm font-bold uppercase tracking-[0.14em] text-slate-400">
+                  Team
+                </h2>
+
+                <div className="mt-4 flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-950 text-sm font-bold text-white">
+                    {project.owner?.name
+                      ?.charAt(0)
+                      .toUpperCase()}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-bold text-slate-950">
+                      {project.owner?.name}
+                    </p>
+                    <p className="truncate text-xs text-slate-500">
+                      {project.owner?.email}
+                    </p>
+                    <p className="mt-1 text-xs font-bold uppercase tracking-[0.14em] text-teal-600">
+                      Lead
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-5 space-y-3">
+                  {project.members
+                    ?.length > 0 ? (
+                    project.members.map(
+                      (member) => (
+                        <div
+                          key={
+                            member.user._id
+                          }
+                          className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3"
+                        >
+                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-xs font-bold text-teal-700">
+                            {member.user.name
+                              ?.charAt(0)
+                              .toUpperCase()}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold text-slate-900">
+                              {
+                                member.user
+                                  .name
+                              }
+                            </p>
+                            <p className="truncate text-xs text-slate-500">
+                              {
+                                member.user
+                                  .email
+                              }
+                            </p>
+                          </div>
+
+                          {isProjectLead && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleRemoveMember(
+                                  member
+                                )
+                              }
+                              disabled={
+                                removeMemberMutation.isPending
+                              }
+                              className="ml-auto text-xs font-bold text-rose-600 transition hover:text-rose-800 disabled:opacity-50"
+                            >
+                              Remove
+                            </button>
+                          )}
+                        </div>
+                      )
+                    )
+                  ) : (
+                    <p className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">
+                      No team members added yet.
+                    </p>
+                  )}
+
+                  {removeMemberError && (
+                    <div className="error-box">
+                      {removeMemberError}
+                    </div>
+                  )}
+                </div>
+              </aside>
             )}
           </div>
-        </div>
-      )}
-{/* Task Mutation Error */}
-{taskError && (
-  <div className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
-    <div className="flex items-start justify-between gap-4">
-      <p className="text-sm text-red-700">
-        {taskError}
-      </p>
+        </section>
 
-      <button
-        type="button"
-        onClick={() => setTaskError("")}
-        className="text-sm font-medium text-red-700 hover:text-red-900"
-        aria-label="Dismiss error"
-      >
-        ✕
-      </button>
-    </div>
-  </div>
-)}
-      {/* Task Loading State */}
-      {areTasksLoading && (
-        <p className="mt-8 text-sm text-[#96796E]">
-          Loading tasks...
-        </p>
-      )}
+        {deleteProjectError && (
+          <div className="mt-4 error-box">
+            {deleteProjectError}
+          </div>
+        )}
 
-      {/* Task Error State */}
-      {areTasksError && (
-        <p className="mt-8 text-sm text-red-600">
-          Unable to load tasks.
-          Please try again.
-        </p>
-      )}
+        {taskError && (
+          <div className="mt-4 error-box">
+            <div className="flex items-start justify-between gap-4">
+              <p>{taskError}</p>
 
-      {/* Search and Filters */}
-      <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(event) =>
-            setSearchQuery(
-              event.target.value
-            )
-          }
-          placeholder="Search tasks..."
-          className="w-full rounded-xl border border-[#D8B7A9] bg-white px-4 py-2.5 text-sm text-[#4B302A] outline-none transition focus:border-[#96796E] sm:max-w-sm"
-        />
+              <button
+                type="button"
+                onClick={() => setTaskError("")}
+                className="font-bold text-rose-700 hover:text-rose-900"
+                aria-label="Dismiss error"
+              >
+                x
+              </button>
+            </div>
+          </div>
+        )}
 
-        <select
-          value={priorityFilter}
-          onChange={(event) =>
-            setPriorityFilter(
-              event.target.value
-            )
-          }
-          className="rounded-xl border border-[#D8B7A9] bg-white px-4 py-2.5 text-sm text-[#4B302A] outline-none transition focus:border-[#96796E]"
-        >
-          <option value="all">
-            All Priorities
-          </option>
+        <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="grid gap-3 lg:grid-cols-[minmax(14rem,1fr)_repeat(3,12rem)_auto]">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(event) =>
+                setSearchQuery(
+                  event.target.value
+                )
+              }
+              placeholder="Search tasks..."
+              className="field py-2.5"
+            />
 
-          <option value="Low">
-            Low Priority
-          </option>
+            <select
+              value={priorityFilter}
+              onChange={(event) =>
+                setPriorityFilter(
+                  event.target.value
+                )
+              }
+              className="field py-2.5"
+            >
+              <option value="all">
+                All Priorities
+              </option>
+              <option value="Low">
+                Low Priority
+              </option>
+              <option value="Medium">
+                Medium Priority
+              </option>
+              <option value="High">
+                High Priority
+              </option>
+            </select>
 
-          <option value="Medium">
-            Medium Priority
-          </option>
+            <select
+              value={statusFilter}
+              onChange={(event) =>
+                setStatusFilter(
+                  event.target.value
+                )
+              }
+              className="field py-2.5"
+            >
+              <option value="all">
+                All Statuses
+              </option>
+              <option value="todo">
+                To Do
+              </option>
+              <option value="in-progress">
+                In Progress
+              </option>
+              <option value="review">
+                Review
+              </option>
+              <option value="done">
+                Done
+              </option>
+            </select>
 
-          <option value="High">
-            High Priority
-          </option>
-        </select>
+            <select
+              value={dueDateFilter}
+              onChange={(event) =>
+                setDueDateFilter(
+                  event.target.value
+                )
+              }
+              className="field py-2.5"
+            >
+              <option value="all">
+                All Due Dates
+              </option>
+              <option value="overdue">
+                Overdue
+              </option>
+              <option value="no-date">
+                No Due Date
+              </option>
+            </select>
 
-        <select
-          value={statusFilter}
-          onChange={(event) =>
-            setStatusFilter(
-              event.target.value
-            )
-          }
-          className="rounded-xl border border-[#D8B7A9] bg-white px-4 py-2.5 text-sm text-[#4B302A] outline-none transition focus:border-[#96796E]"
-        >
-          <option value="all">
-            All Statuses
-          </option>
-          <option value="todo">
-            To Do
-          </option>
-          <option value="in-progress">
-            In Progress
-          </option>
-          <option value="review">
-            Review
-          </option>
-          <option value="done">
-            Done
-          </option>
-        </select>
+            <button
+              type="button"
+              onClick={
+                handleClearFilters
+              }
+              disabled={!filtersAreActive}
+              className="btn-secondary whitespace-nowrap"
+            >
+              Clear
+            </button>
+          </div>
+        </section>
 
-        <select
-          value={dueDateFilter}
-          onChange={(event) =>
-            setDueDateFilter(
-              event.target.value
-            )
-          }
-          className="rounded-xl border border-[#D8B7A9] bg-white px-4 py-2.5 text-sm text-[#4B302A] outline-none transition focus:border-[#96796E]"
-        >
-          <option value="all">
-            All Due Dates
-          </option>
-          <option value="overdue">
-            Overdue
-          </option>
-          <option value="no-date">
-            No Due Date
-          </option>
-        </select>
+        {areTasksLoading && (
+          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {kanbanColumns.map((column) => (
+              <div
+                key={column.id}
+                className="min-h-[24rem] animate-pulse rounded-2xl border border-slate-200 bg-slate-50 p-4"
+              >
+                <div className="h-4 w-24 rounded bg-slate-200" />
+                <div className="mt-6 h-28 rounded-2xl bg-white" />
+                <div className="mt-3 h-24 rounded-2xl bg-white" />
+              </div>
+            ))}
+          </div>
+        )}
 
-        <button
-          type="button"
-          onClick={
-            handleClearFilters
-          }
-          disabled={
-            !searchQuery &&
-            priorityFilter ===
-              "all" &&
-            statusFilter ===
-              "all" &&
-            dueDateFilter ===
-              "all"
-          }
-          className="rounded-xl border border-[#D8B7A9] px-4 py-2.5 text-sm font-medium text-[#795D54] transition hover:bg-[#F8E3D7] disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          Clear Filters
-        </button>
-      </div>
+        {areTasksError && (
+          <div className="mt-6 error-box">
+            Unable to load tasks. Please try again.
+          </div>
+        )}
 
-      {/* Kanban Board */}
-      {!areTasksLoading &&
-        !areTasksError && (
-          <DndContext
-            sensors={sensors}
-            onDragEnd={
-              handleDragEnd
-            }
-          >
-            <div className="mt-8">
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {!areTasksLoading &&
+          !areTasksError && (
+            <DndContext
+              sensors={sensors}
+              onDragEnd={
+                handleDragEnd
+              }
+            >
+              <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
                 {visibleColumns.map(
                   (column) => {
                     const columnTasks =
@@ -1268,92 +1198,87 @@ const handleDeleteTask = (taskId) => {
                   }
                 )}
               </div>
-            </div>
-          </DndContext>
+            </DndContext>
+          )}
+
+        {isTaskModalOpen && (
+          <TaskModal
+            project={project}
+            onClose={() => {
+              setTaskError("");
+              setIsTaskModalOpen(false);
+            }}
+            onCreateTask={handleCreateTask}
+            isSubmitting={createTaskMutation.isPending}
+            serverError={taskError}
+          />
         )}
 
-      {/* Create Task Modal */}
-      {isTaskModalOpen && (
-        <TaskModal
-          project={project}
-          onClose={() => {
-            setTaskError("");
-            setIsTaskModalOpen(false);
-          }}
-          onCreateTask={handleCreateTask}
-          isSubmitting={createTaskMutation.isPending}
-          serverError={taskError}
-        />
-      )}
-
-      {/* Edit Project Modal */}
-      {isEditProjectOpen && (
-        <EditProjectModal
-          project={project}
-          onClose={() => {
-            setProjectUpdateError(
-              ""
-            );
-
-            setIsEditProjectOpen(
-              false
-            );
-          }}
-          onUpdateProject={(
-            projectData
-          ) =>
-            updateProjectMutation.mutateAsync(
+        {isEditProjectOpen && (
+          <EditProjectModal
+            project={project}
+            onClose={() => {
+              setProjectUpdateError(
+                ""
+              );
+              setIsEditProjectOpen(
+                false
+              );
+            }}
+            onUpdateProject={(
               projectData
-            )
-          }
-          isSubmitting={
-            updateProjectMutation.isPending
-          }
-          serverError={
-            projectUpdateError
-          }
-        />
-      )}
+            ) =>
+              updateProjectMutation.mutateAsync(
+                projectData
+              )
+            }
+            isSubmitting={
+              updateProjectMutation.isPending
+            }
+            serverError={
+              projectUpdateError
+            }
+          />
+        )}
 
-      {/* Add Member Modal */}
-      {isAddMemberModalOpen && (
-        <AddMemberModal
-          onClose={() =>
-            setIsAddMemberModalOpen(
-              false
-            )
-          }
-          onAddMember={(email) =>
-            addMemberMutation.mutateAsync(
-              email
-            )
-          }
-          isSubmitting={
-            addMemberMutation.isPending
-          }
-        />
-      )}
+        {isAddMemberModalOpen && (
+          <AddMemberModal
+            onClose={() =>
+              setIsAddMemberModalOpen(
+                false
+              )
+            }
+            onAddMember={(email) =>
+              addMemberMutation.mutateAsync(
+                email
+              )
+            }
+            isSubmitting={
+              addMemberMutation.isPending
+            }
+          />
+        )}
 
-      {/* Task Details Modal */}
-      {selectedTask && (
-        <TaskDetailsModal
-          task={selectedTask}
-          project={project}
-          isProjectLead={isProjectLead}
-          isAssignedToCurrentUser={
-            selectedTask.assignedTo?._id === user?._id
-          }
-          onClose={() => {
-            setTaskError("");
-            setSelectedTask(null);
-          }}
-          onUpdateTask={handleUpdateTask}
-          onDeleteTask={handleDeleteTask}
-          isUpdating={updateTaskMutation.isPending}
-          isDeleting={deleteTaskMutation.isPending}
-          serverError={taskError}
-        />
-      )}
+        {selectedTask && (
+          <TaskDetailsModal
+            task={selectedTask}
+            project={project}
+            isProjectLead={isProjectLead}
+            isAssignedToCurrentUser={
+              selectedTask.assignedTo?._id === user?._id
+            }
+            onClose={() => {
+              setTaskError("");
+              setSelectedTask(null);
+            }}
+            onUpdateTask={handleUpdateTask}
+            onDeleteTask={handleDeleteTask}
+            isUpdating={updateTaskMutation.isPending}
+            isDeleting={deleteTaskMutation.isPending}
+            serverError={taskError}
+          />
+        )}
+      </div>
     </div>
   );
 }

@@ -48,8 +48,6 @@ function TaskDetailsModal({
       return;
     }
 
-    // Project lead can update
-    // all editable fields
     if (isProjectLead) {
       onUpdateTask({
         ...task,
@@ -64,8 +62,6 @@ function TaskDetailsModal({
       return;
     }
 
-    // Assigned member can
-    // update status only
     if (isAssignedToCurrentUser) {
       onUpdateTask({
         ...task,
@@ -113,17 +109,27 @@ function TaskDetailsModal({
     isProjectLead ||
     isAssignedToCurrentUser;
 
+  const detailItems = [
+    ["Status", task.status],
+    ["Priority", task.priority],
+    [
+      "Due Date",
+      task.dueDate
+        ? new Date(task.dueDate).toLocaleDateString()
+        : "No due date",
+    ],
+  ];
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#4B302A]/40 p-4 backdrop-blur-[2px]">
-      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-[#E2C4B8] bg-[#FFF9F2] p-6 shadow-xl">
-        {/* Header */}
+    <div className="modal-backdrop">
+      <div className="modal-panel max-w-2xl">
         <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-xl font-semibold text-[#4B302A]">
+          <div className="min-w-0">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-teal-600">
               Task Details
             </p>
 
-            <h2 className="mt-2 text-lg text-[#96796E]">
+            <h2 className="mt-2 break-words text-2xl font-bold tracking-tight text-slate-950">
               {task.title}
             </h2>
           </div>
@@ -132,33 +138,69 @@ function TaskDetailsModal({
             type="button"
             onClick={onClose}
             disabled={isSubmitting}
-            className="rounded-lg px-3 py-1 text-[#96796E] transition hover:bg-[#F8E3D7] hover:text-[#4B302A] disabled:cursor-not-allowed disabled:opacity-50"
+            className="icon-button shrink-0"
             aria-label="Close task details"
           >
-            ✕
+            x
           </button>
         </div>
 
-        {/* Server Error */}
         {serverError && (
-          <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
-            <p className="text-sm text-red-700">
-              {serverError}
-            </p>
+          <div className="mt-4 error-box">
+            {serverError}
           </div>
         )}
 
-        {/* Edit Mode */}
         {isEditing ? (
           <div className="mt-6 space-y-4">
-            {/* Assignment - Lead only */}
+            {isProjectLead && (
+              <>
+                <div>
+                  <label
+                    htmlFor="edit-title"
+                    className="label"
+                  >
+                    Title
+                  </label>
+
+                  <input
+                    id="edit-title"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    disabled={isSubmitting}
+                    className="field"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="edit-description"
+                    className="label"
+                  >
+                    Description
+                  </label>
+
+                  <textarea
+                    id="edit-description"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    rows="4"
+                    disabled={isSubmitting}
+                    className="field"
+                  />
+                </div>
+              </>
+            )}
+
             {isProjectLead &&
               project?.projectType ===
                 "team" && (
                 <div>
                   <label
                     htmlFor="edit-assigned-to"
-                    className="mb-1.5 block text-sm font-medium text-[#4B302A]"
+                    className="label"
                   >
                     Assign To
                   </label>
@@ -175,7 +217,7 @@ function TaskDetailsModal({
                     disabled={
                       isSubmitting
                     }
-                    className="w-full rounded-xl border border-[#D8B7A9] bg-white px-3 py-2.5 text-[#4B302A] outline-none transition focus:border-[#96796E] focus:ring-2 focus:ring-[#EDB7A6]/40 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="field"
                   >
                     <option value="">
                       Unassigned
@@ -211,11 +253,10 @@ function TaskDetailsModal({
                   : ""
               }
             >
-              {/* Status */}
               <div>
                 <label
                   htmlFor="edit-status"
-                  className="mb-1.5 block text-sm font-medium text-[#4B302A]"
+                  className="label"
                 >
                   Status
                 </label>
@@ -232,32 +273,28 @@ function TaskDetailsModal({
                   disabled={
                     isSubmitting
                   }
-                  className="w-full rounded-xl border border-[#D8B7A9] bg-white px-3 py-2.5 text-[#4B302A] outline-none transition focus:border-[#96796E] focus:ring-2 focus:ring-[#EDB7A6]/40 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="field"
                 >
                   <option value="todo">
                     To Do
                   </option>
-
                   <option value="in-progress">
                     In Progress
                   </option>
-
                   <option value="review">
                     Review
                   </option>
-
                   <option value="done">
                     Done
                   </option>
                 </select>
               </div>
 
-              {/* Priority - Lead only */}
               {isProjectLead && (
                 <div>
                   <label
                     htmlFor="edit-priority"
-                    className="mb-1.5 block text-sm font-medium text-[#4B302A]"
+                    className="label"
                   >
                     Priority
                   </label>
@@ -274,16 +311,14 @@ function TaskDetailsModal({
                     disabled={
                       isSubmitting
                     }
-                    className="w-full rounded-xl border border-[#D8B7A9] bg-white px-3 py-2.5 text-[#4B302A] outline-none transition focus:border-[#96796E] focus:ring-2 focus:ring-[#EDB7A6]/40 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="field"
                   >
                     <option value="Low">
                       Low
                     </option>
-
                     <option value="Medium">
                       Medium
                     </option>
-
                     <option value="High">
                       High
                     </option>
@@ -292,12 +327,11 @@ function TaskDetailsModal({
               )}
             </div>
 
-            {/* Due Date - Lead only */}
             {isProjectLead && (
               <div>
                 <label
                   htmlFor="edit-due-date"
-                  className="mb-1.5 block text-sm font-medium text-[#4B302A]"
+                  className="label"
                 >
                   Due Date
                 </label>
@@ -315,98 +349,79 @@ function TaskDetailsModal({
                   disabled={
                     isSubmitting
                   }
-                  className="w-full rounded-xl border border-[#D8B7A9] bg-white px-3 py-2.5 text-[#4B302A] outline-none transition focus:border-[#96796E] focus:ring-2 focus:ring-[#EDB7A6]/40 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="field"
                 />
               </div>
             )}
 
             {!isProjectLead &&
               isAssignedToCurrentUser && (
-                <p className="text-xs text-[#96796E]">
-                  You can update the
-                  status of this task
-                  because it is assigned
-                  to you.
+                <p className="rounded-xl bg-slate-50 px-4 py-3 text-xs leading-5 text-slate-500">
+                  You can update the status of this task because it is assigned to you.
                 </p>
               )}
           </div>
         ) : (
-          /* View Mode */
-          <div className="mt-6 space-y-5">
+          <div className="mt-6 space-y-6">
             <div>
-              <p className="text-lg font-semibold text-[#4B302A]">
+              <p className="text-sm font-bold uppercase tracking-[0.14em] text-slate-400">
                 Description
               </p>
 
-              <p className="mt-2 text-sm text-[#4B302A]">
+              <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-700">
                 {task.description ||
                   "No description provided."}
               </p>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <p className="text-lg font-semibold text-[#4B302A]">
-                  Status
-                </p>
-
-                <p className="mt-2 text-sm text-[#4B302A]">
-                  {task.status}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-lg font-semibold text-[#4B302A]">
-                  Priority
-                </p>
-
-                <p className="mt-2 text-sm text-[#4B302A]">
-                  {task.priority}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-lg font-semibold text-[#4B302A]">
-                  Due Date
-                </p>
-
-                <p className="mt-2 text-sm text-[#4B302A]">
-                  {task.dueDate
-                    ? new Date(
-                        task.dueDate
-                      ).toLocaleDateString()
-                    : "No due date"}
-                </p>
-              </div>
-
-              {/* Assigned Member */}
-              {task.assignedTo && (
-                <div>
-                  <p className="text-lg font-semibold text-[#4B302A]">
-                    Assigned To
+            <div className="grid gap-3 sm:grid-cols-3">
+              {detailItems.map(([label, value]) => (
+                <div
+                  key={label}
+                  className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                >
+                  <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">
+                    {label}
                   </p>
-
-                  <p className="mt-2 text-sm text-[#4B302A]">
-                    {
-                      task.assignedTo
-                        .name
-                    }
-                  </p>
-
-                  <p className="mt-1 text-xs text-[#96796E]">
-                    {
-                      task.assignedTo
-                        .email
-                    }
+                  <p className="mt-2 text-sm font-semibold capitalize text-slate-900">
+                    {value}
                   </p>
                 </div>
-              )}
+              ))}
             </div>
+
+            {task.assignedTo && (
+              <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">
+                  Assigned To
+                </p>
+                <div className="mt-3 flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-100 text-sm font-bold text-teal-700">
+                    {task.assignedTo.name
+                      ?.charAt(0)
+                      .toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-950">
+                      {
+                        task.assignedTo
+                          .name
+                      }
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {
+                        task.assignedTo
+                          .email
+                      }
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
-        {/* Actions */}
-        <div className="mt-6 flex justify-end gap-3">
+        <div className="mt-6 flex flex-wrap justify-end gap-3 border-t border-slate-100 pt-5">
           {isEditing ? (
             <>
               <button
@@ -417,7 +432,7 @@ function TaskDetailsModal({
                 disabled={
                   isSubmitting
                 }
-                className="rounded-xl border border-[#D8B7A9] px-4 py-2.5 text-sm font-medium text-[#795D54] transition hover:bg-[#F8E3D7] disabled:cursor-not-allowed disabled:opacity-50"
+                className="btn-secondary"
               >
                 Cancel
               </button>
@@ -428,7 +443,7 @@ function TaskDetailsModal({
                 disabled={
                   isSubmitting
                 }
-                className="rounded-xl bg-[#4B302A] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#624139] disabled:cursor-not-allowed disabled:opacity-60"
+                className="btn-primary"
               >
                 {isUpdating
                   ? "Saving..."
@@ -439,7 +454,6 @@ function TaskDetailsModal({
             </>
           ) : (
             <>
-              {/* Delete - Lead only */}
               {isProjectLead && (
                 <button
                   type="button"
@@ -449,7 +463,7 @@ function TaskDetailsModal({
                   disabled={
                     isSubmitting
                   }
-                  className="mr-auto rounded-xl px-4 py-2.5 text-sm font-medium text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="btn-danger mr-auto"
                 >
                   {isDeleting
                     ? "Deleting..."
@@ -463,12 +477,11 @@ function TaskDetailsModal({
                 disabled={
                   isSubmitting
                 }
-                className="rounded-xl border border-[#D8B7A9] px-4 py-2.5 text-sm font-medium text-[#795D54] transition hover:bg-[#F8E3D7] disabled:cursor-not-allowed disabled:opacity-50"
+                className="btn-secondary"
               >
                 Close
               </button>
 
-              {/* Edit */}
               {canEdit && (
                 <button
                   type="button"
@@ -478,7 +491,7 @@ function TaskDetailsModal({
                   disabled={
                     isSubmitting
                   }
-                  className="rounded-xl bg-[#4B302A] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#624139] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="btn-primary"
                 >
                   {isProjectLead
                     ? "Edit Task"

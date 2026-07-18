@@ -49,27 +49,29 @@ function CreateProjectModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#4B302A]/40 p-4 backdrop-blur-[2px]">
-      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-[#E2C4B8] bg-[#FFF9F2] p-6 shadow-xl">
-        {/* Header */}
+    <div className="modal-backdrop">
+      <div className="modal-panel max-w-lg">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-xl font-semibold text-[#4B302A]">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-teal-600">
+              New Project
+            </p>
+            <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-950">
               Create Project
             </h2>
 
-            <p className="mt-1 text-sm text-[#96796E]">
-              Create a new project and start organizing your tasks.
+            <p className="mt-1 text-sm leading-6 text-slate-500">
+              Set up a workspace for tasks, deadlines, and collaboration.
             </p>
           </div>
 
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg px-3 py-1 text-[#96796E] transition hover:bg-[#F8E3D7] hover:text-[#4B302A]"
+            className="icon-button"
             aria-label="Close create project modal"
           >
-            ✕
+            x
           </button>
         </div>
 
@@ -77,11 +79,10 @@ function CreateProjectModal({
           onSubmit={handleSubmit}
           className="mt-6 space-y-4"
         >
-          {/* Project Name */}
           <div>
             <label
               htmlFor="name"
-              className="mb-2 block text-sm font-medium text-[#4B302A]"
+              className="label"
             >
               Project Name
             </label>
@@ -93,15 +94,14 @@ function CreateProjectModal({
               value={formData.name}
               onChange={handleChange}
               placeholder="Enter project name"
-              className="w-full rounded-xl border border-[#D8B7A9] bg-white px-4 py-3 text-sm text-[#4B302A] outline-none transition focus:border-[#96796E]"
+              className="field"
             />
           </div>
 
-          {/* Description */}
           <div>
             <label
               htmlFor="description"
-              className="mb-2 block text-sm font-medium text-[#4B302A]"
+              className="label"
             >
               Description
             </label>
@@ -113,77 +113,73 @@ function CreateProjectModal({
               onChange={handleChange}
               rows="3"
               placeholder="Describe your project"
-              className="w-full rounded-xl border border-[#D8B7A9] bg-white px-4 py-3 text-sm text-[#4B302A] outline-none transition focus:border-[#96796E]"
+              className="field"
             />
           </div>
 
-          {/* Project Type */}
-          <div>
-            <label
-              htmlFor="projectType"
-              className="mb-2 block text-sm font-medium text-[#4B302A]"
-            >
-              Project Type
-            </label>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label
+                htmlFor="projectType"
+                className="label"
+              >
+                Project Type
+              </label>
 
-            <select
-              id="projectType"
-              name="projectType"
-              value={formData.projectType}
-              onChange={handleChange}
-              className="w-full rounded-xl border border-[#D8B7A9] bg-white px-4 py-3 text-sm text-[#4B302A] outline-none transition focus:border-[#96796E]"
-            >
-              <option value="single">
-                Single Project
-              </option>
+              <select
+                id="projectType"
+                name="projectType"
+                value={formData.projectType}
+                onChange={handleChange}
+                className="field"
+              >
+                <option value="single">
+                  Personal
+                </option>
+                <option value="team">
+                  Team
+                </option>
+              </select>
+            </div>
 
-              <option value="team">
-                Team Project
-              </option>
-            </select>
+            <div>
+              <label
+                htmlFor="status"
+                className="label"
+              >
+                Status
+              </label>
 
-            <p className="mt-2 text-xs text-[#96796E]">
-              {formData.projectType === "team"
-                ? "Create a collaborative project where you can add members and assign tasks."
-                : "Create a personal project managed only by you."}
-            </p>
+              <select
+                id="status"
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className="field"
+              >
+                <option value="planning">
+                  Planning
+                </option>
+                <option value="active">
+                  Active
+                </option>
+                <option value="completed">
+                  Completed
+                </option>
+              </select>
+            </div>
           </div>
 
-          {/* Status */}
-          <div>
-            <label
-              htmlFor="status"
-              className="mb-2 block text-sm font-medium text-[#4B302A]"
-            >
-              Status
-            </label>
+          <p className="rounded-xl bg-slate-50 px-4 py-3 text-xs leading-5 text-slate-500">
+            {formData.projectType === "team"
+              ? "Team projects let you add members and assign work."
+              : "Personal projects stay private to your account."}
+          </p>
 
-            <select
-  id="status"
-  name="status"
-  value={formData.status}
-  onChange={handleChange}
-  className="w-full rounded-xl border border-[#D8B7A9] bg-white px-4 py-3 text-sm text-[#4B302A] outline-none transition focus:border-[#96796E]"
->
-  <option value="planning">
-    Planning
-  </option>
-
-  <option value="active">
-    Active
-  </option>
-
-  <option value="completed">
-    Completed
-  </option>
-</select>
-          </div>
-
-          {/* Due Date */}
           <div>
             <label
               htmlFor="dueDate"
-              className="mb-2 block text-sm font-medium text-[#4B302A]"
+              className="label"
             >
               Due Date
             </label>
@@ -194,23 +190,21 @@ function CreateProjectModal({
               type="date"
               value={formData.dueDate}
               onChange={handleChange}
-              className="w-full rounded-xl border border-[#D8B7A9] bg-white px-4 py-3 text-sm text-[#4B302A] outline-none transition focus:border-[#96796E]"
+              className="field"
             />
           </div>
 
-          {/* Error */}
           {error && (
-            <p className="text-sm text-red-600">
+            <div className="error-box">
               {error}
-            </p>
+            </div>
           )}
 
-          {/* Actions */}
           <div className="flex justify-end gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl border border-[#D8B7A9] px-4 py-2.5 text-sm font-medium text-[#795D54] transition hover:bg-[#F8E3D7]"
+              className="btn-secondary"
             >
               Cancel
             </button>
@@ -218,7 +212,7 @@ function CreateProjectModal({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-xl bg-[#4B302A] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#624139] disabled:cursor-not-allowed disabled:opacity-60"
+              className="btn-primary"
             >
               {isSubmitting
                 ? "Creating..."

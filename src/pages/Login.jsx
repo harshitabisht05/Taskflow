@@ -44,88 +44,121 @@ function Login() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#FFF3DF] px-4">
-      <div className="w-full max-w-md rounded-2xl border border-[#E2C4B8] bg-[#FFF9F2] p-8 shadow-sm">
-        <div className="text-center">
-          <h1 className="text-3xl font-semibold text-[#4B302A]">
-            Welcome back
-          </h1>
-
-          <p className="mt-2 text-sm text-[#96796E]">
-            Log in to continue to TaskFlow.
-          </p>
-        </div>
-
-        <form
-          onSubmit={handleSubmit}
-          className="mt-8 space-y-5"
-        >
+    <div className="flex min-h-screen items-center justify-center px-4 py-10">
+      <div className="grid w-full max-w-5xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/80 lg:grid-cols-[1fr_0.95fr]">
+        <section className="hidden bg-slate-950 p-10 text-white lg:flex lg:flex-col lg:justify-between">
           <div>
-            <label
-              htmlFor="email"
-              className="mb-2 block text-sm font-medium text-[#4B302A]"
-            >
-              Email
-            </label>
-
-            <input
-              id="email"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              placeholder="you@example.com"
-              className="w-full rounded-xl border border-[#D8B7A9] bg-white px-4 py-3 text-sm text-[#4B302A] outline-none focus:border-[#96796E]"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="password"
-              className="mb-2 block text-sm font-medium text-[#4B302A]"
-            >
-              Password
-            </label>
-
-            <input
-              id="password"
-              name="password"
-              type="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              placeholder="Enter your password"
-              className="w-full rounded-xl border border-[#D8B7A9] bg-white px-4 py-3 text-sm text-[#4B302A] outline-none focus:border-[#96796E]"
-            />
-          </div>
-
-          {error && (
-            <p className="text-sm text-red-600">
-              {error}
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-400 text-sm font-black text-slate-950">
+              TF
+            </div>
+            <h1 className="mt-8 max-w-sm text-4xl font-bold tracking-tight">
+              Bring every project back into focus.
+            </h1>
+            <p className="mt-4 max-w-md text-sm leading-6 text-slate-300">
+              Track deadlines, move tasks across the board, and keep teams aligned without losing the thread.
             </p>
-          )}
+          </div>
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full rounded-xl bg-[#4B302A] px-4 py-3 text-sm font-medium text-white transition hover:bg-[#624139] disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isSubmitting
-              ? "Logging in..."
-              : "Log In"}
-          </button>
-        </form>
+          <div className="grid grid-cols-3 gap-3 text-sm">
+            <div className="rounded-2xl bg-white/10 p-4">
+              <p className="font-bold">Boards</p>
+              <p className="mt-1 text-xs text-slate-400">Plan visually</p>
+            </div>
+            <div className="rounded-2xl bg-white/10 p-4">
+              <p className="font-bold">Teams</p>
+              <p className="mt-1 text-xs text-slate-400">Assign clearly</p>
+            </div>
+            <div className="rounded-2xl bg-white/10 p-4">
+              <p className="font-bold">Progress</p>
+              <p className="mt-1 text-xs text-slate-400">Ship steadily</p>
+            </div>
+          </div>
+        </section>
 
-        <p className="mt-6 text-center text-sm text-[#96796E]">
-          Don't have an account?{" "}
-          <Link
-            to="/register"
-            className="font-medium text-[#4B302A] hover:underline"
+        <section className="p-6 sm:p-8 lg:p-10">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-600">
+              TaskFlow
+            </p>
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950">
+              Welcome back
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-slate-500">
+              Log in to continue managing your workspace.
+            </p>
+          </div>
+
+          <form
+            onSubmit={handleSubmit}
+            className="mt-8 space-y-5"
           >
-            Create account
-          </Link>
-        </p>
+            <div>
+              <label
+                htmlFor="email"
+                className="label"
+              >
+                Email
+              </label>
+
+              <input
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                placeholder="you@example.com"
+                className="field"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="password"
+                className="label"
+              >
+                Password
+              </label>
+
+              <input
+                id="password"
+                name="password"
+                type="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                placeholder="Enter your password"
+                className="field"
+              />
+            </div>
+
+            {error && (
+              <div className="error-box">
+                {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="btn-primary w-full"
+            >
+              {isSubmitting
+                ? "Logging in..."
+                : "Log In"}
+            </button>
+          </form>
+
+          <p className="mt-6 text-center text-sm text-slate-500">
+            Don't have an account?{" "}
+            <Link
+              to="/register"
+              className="font-semibold text-teal-700 hover:text-teal-800 hover:underline"
+            >
+              Create account
+            </Link>
+          </p>
+        </section>
       </div>
     </div>
   );

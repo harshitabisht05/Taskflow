@@ -4,14 +4,14 @@ import Header from "./Header";
 
 function AppLayout() {
   return (
-    <div className="flex min-h-screen bg-[#FFF3DF]">
+    <div className="flex min-h-screen bg-slate-100 text-slate-900">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
-          <Header />
-      <main className="flex-1 bg-[#FFF3DF]">
-        <Outlet />
-      </main>
-    </div>
+        <Header />
+        <main className="flex-1">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }

@@ -30,34 +30,34 @@ function TaskCard({
   };
 
   const priorityStyles = {
-    High: "bg-[#F2B8A8] text-[#6B352B]",
-    Medium: "bg-[#F5D5B8] text-[#76512F]",
-    Low: "bg-[#D8E1C5] text-[#53603D]",
+    High: "bg-rose-50 text-rose-700 ring-rose-200",
+    Medium: "bg-amber-50 text-amber-700 ring-amber-200",
+    Low: "bg-emerald-50 text-emerald-700 ring-emerald-200",
   };
-const today = new Date();
-today.setHours(0, 0, 0, 0);
 
-const taskDueDate = dueDate
-  ? new Date(dueDate)
-  : null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-const isOverdue =
-  taskDueDate &&
-  taskDueDate < today
-  &&
-  status !== "done";
+  const taskDueDate = dueDate
+    ? new Date(dueDate)
+    : null;
+
+  const isOverdue =
+    taskDueDate &&
+    taskDueDate < today &&
+    status !== "done";
 
   return (
     <article
       ref={setNodeRef}
       style={style}
       onClick={onClick}
-      className={`rounded-2xl border border-[#E2C4B8] bg-[#FFF9F2] p-4 shadow-sm transition-shadow hover:shadow-md ${
-        isDragging ? "opacity-50" : ""
+      className={`surface rounded-2xl p-4 transition hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-md ${
+        isDragging ? "scale-[0.98] opacity-60" : ""
       }`}
     >
       <div className="flex items-start justify-between gap-3">
-        <h3 className="font-semibold leading-6 text-[#4B302A]">
+        <h3 className="min-w-0 text-sm font-bold leading-6 text-slate-950">
           {title}
         </h3>
 
@@ -66,55 +66,57 @@ const isOverdue =
           {...attributes}
           {...listeners}
           onClick={(event) => event.stopPropagation()}
-          className="cursor-grab rounded-lg px-2 py-1 text-[#96796E] hover:bg-[#F1E5DD] active:cursor-grabbing"
+          className="icon-button h-8 w-8 shrink-0 cursor-grab active:cursor-grabbing"
           aria-label="Drag task"
+          title="Drag task"
         >
-          ⋮⋮
+          <span className="leading-none" aria-hidden="true">
+            ::
+          </span>
         </button>
       </div>
 
-      <div className="mt-2">
+      <div className="mt-3 flex flex-wrap items-center gap-2">
         <span
-          className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${
+          className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ring-1 ${
             priorityStyles[priority] ??
-            "bg-[#F1E5DD] text-[#795D54]"
+            "bg-slate-100 text-slate-600 ring-slate-200"
           }`}
         >
           {priority}
         </span>
+
+        {dueDate && (
+          <span
+            className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
+              isOverdue
+                ? "bg-rose-50 text-rose-700"
+                : "bg-slate-100 text-slate-500"
+            }`}
+          >
+            {isOverdue ? "Overdue " : "Due "}
+            {new Date(dueDate).toLocaleDateString()}
+          </span>
+        )}
       </div>
 
-      <p className="mt-3 line-clamp-3 text-sm leading-5 text-[#795D54]">
+      <p className="mt-3 line-clamp-3 text-sm leading-6 text-slate-600">
         {description || "No description provided."}
       </p>
 
-      <div className="mt-4 border-t border-[#E8D2C8] pt-3">
-        {dueDate && (
-  <p
-    className={`text-xs ${
-      isOverdue
-        ? "font-medium text-red-600"
-        : "text-[#96796E]"
-    }`}
-  >
-    {isOverdue ? "Overdue: " : "Due: "}
-    {new Date(dueDate).toLocaleDateString()}
-  </p>
-)}
-      </div>
       {assignedTo && (
-  <div className="mt-3 flex items-center gap-2">
-    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#E2C4B8] text-xs font-semibold text-[#4B302A]">
-      {assignedTo.name
-        ?.charAt(0)
-        .toUpperCase()}
-    </div>
+        <div className="mt-4 flex items-center gap-2 border-t border-slate-100 pt-3">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-teal-100 text-xs font-bold text-teal-700">
+            {assignedTo.name
+              ?.charAt(0)
+              .toUpperCase()}
+          </div>
 
-    <span className="text-xs text-[#96796E]">
-      {assignedTo.name}
-    </span>
-  </div>
-)}
+          <span className="truncate text-xs font-semibold text-slate-500">
+            {assignedTo.name}
+          </span>
+        </div>
+      )}
     </article>
   );
 }

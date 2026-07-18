@@ -33,7 +33,6 @@ function Register() {
 
     try {
       await register(formData);
-
       navigate("/dashboard");
     } catch (error) {
       setError(
@@ -46,15 +45,18 @@ function Register() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#FFF3DF] px-4">
-      <div className="w-full max-w-md rounded-2xl border border-[#E2C4B8] bg-[#FFF9F2] p-8 shadow-sm">
-        <div className="text-center">
-          <h1 className="text-3xl font-semibold text-[#4B302A]">
+    <div className="flex min-h-screen items-center justify-center px-4 py-10">
+      <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/80 sm:p-8">
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-600">
+            TaskFlow
+          </p>
+          <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-950">
             Create your account
           </h1>
 
-          <p className="mt-2 text-sm text-[#96796E]">
-            Start managing your projects with TaskFlow.
+          <p className="mt-2 text-sm leading-6 text-slate-500">
+            Start managing projects, tasks, and team handoffs in one place.
           </p>
         </div>
 
@@ -65,7 +67,7 @@ function Register() {
           <div>
             <label
               htmlFor="name"
-              className="mb-2 block text-sm font-medium text-[#4B302A]"
+              className="label"
             >
               Name
             </label>
@@ -77,7 +79,7 @@ function Register() {
               value={formData.name}
               onChange={handleChange}
               required
-              className="w-full rounded-xl border border-[#D8B7A9] bg-white px-4 py-3 text-sm text-[#4B302A] outline-none focus:border-[#96796E]"
+              className="field"
               placeholder="Enter your name"
             />
           </div>
@@ -85,7 +87,7 @@ function Register() {
           <div>
             <label
               htmlFor="email"
-              className="mb-2 block text-sm font-medium text-[#4B302A]"
+              className="label"
             >
               Email
             </label>
@@ -97,7 +99,7 @@ function Register() {
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full rounded-xl border border-[#D8B7A9] bg-white px-4 py-3 text-sm text-[#4B302A] outline-none focus:border-[#96796E]"
+              className="field"
               placeholder="you@example.com"
             />
           </div>
@@ -105,7 +107,7 @@ function Register() {
           <div>
             <label
               htmlFor="password"
-              className="mb-2 block text-sm font-medium text-[#4B302A]"
+              className="label"
             >
               Password
             </label>
@@ -118,21 +120,21 @@ function Register() {
               onChange={handleChange}
               required
               minLength={6}
-              className="w-full rounded-xl border border-[#D8B7A9] bg-white px-4 py-3 text-sm text-[#4B302A] outline-none focus:border-[#96796E]"
+              className="field"
               placeholder="Minimum 6 characters"
             />
           </div>
 
           {error && (
-            <p className="text-sm text-red-600">
+            <div className="error-box">
               {error}
-            </p>
+            </div>
           )}
 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full rounded-xl bg-[#4B302A] px-4 py-3 text-sm font-medium text-white transition hover:bg-[#624139] disabled:cursor-not-allowed disabled:opacity-60"
+            className="btn-primary w-full"
           >
             {isSubmitting
               ? "Creating account..."
@@ -140,11 +142,11 @@ function Register() {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-[#96796E]">
+        <p className="mt-6 text-center text-sm text-slate-500">
           Already have an account?{" "}
           <Link
             to="/login"
-            className="font-medium text-[#4B302A] hover:underline"
+            className="font-semibold text-teal-700 hover:text-teal-800 hover:underline"
           >
             Log in
           </Link>

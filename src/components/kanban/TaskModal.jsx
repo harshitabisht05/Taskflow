@@ -56,35 +56,35 @@ function TaskModal({
     validationError || serverError;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#4B302A]/40 p-4 backdrop-blur-[2px]">
-      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-[#E2C4B8] bg-[#FFF9F2] p-6 shadow-xl">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-[#4B302A]">
-            Create Task
-          </h2>
+    <div className="modal-backdrop">
+      <div className="modal-panel max-w-lg">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-teal-600">
+              Task
+            </p>
+            <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-950">
+              Create Task
+            </h2>
+            <p className="mt-1 text-sm leading-6 text-slate-500">
+              Add a task with ownership, priority, and a due date.
+            </p>
+          </div>
 
           <button
             type="button"
             onClick={onClose}
             disabled={isSubmitting}
-            className="rounded-lg px-3 py-1 text-[#96796E] transition hover:bg-[#F8E3D7] hover:text-[#4B302A] disabled:cursor-not-allowed disabled:opacity-50"
+            className="icon-button"
             aria-label="Close task modal"
           >
-            ✕
+            x
           </button>
         </div>
 
-        <p className="mt-2 text-sm text-[#96796E]">
-          Add a new task to this project.
-        </p>
-
-        {/* Error */}
         {displayedError && (
-          <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
-            <p className="text-sm text-red-700">
-              {displayedError}
-            </p>
+          <div className="mt-4 error-box">
+            {displayedError}
           </div>
         )}
 
@@ -93,11 +93,10 @@ function TaskModal({
           onSubmit={handleSubmit}
           className="mt-6 space-y-4"
         >
-          {/* Title */}
           <div>
             <label
               htmlFor="title"
-              className="mb-1.5 block text-sm font-medium text-[#4B302A]"
+              className="label"
             >
               Title
             </label>
@@ -110,15 +109,14 @@ function TaskModal({
               onChange={handleChange}
               placeholder="Enter task title"
               disabled={isSubmitting}
-              className="w-full rounded-xl border border-[#D8B7A9] bg-white px-3 py-2.5 text-[#4B302A] outline-none transition focus:border-[#96796E] focus:ring-2 focus:ring-[#EDB7A6]/40 disabled:cursor-not-allowed disabled:opacity-60"
+              className="field"
             />
           </div>
 
-          {/* Description */}
           <div>
             <label
               htmlFor="description"
-              className="mb-1.5 block text-sm font-medium text-[#4B302A]"
+              className="label"
             >
               Description
             </label>
@@ -131,16 +129,15 @@ function TaskModal({
               placeholder="Enter task description"
               rows="3"
               disabled={isSubmitting}
-              className="w-full rounded-xl border border-[#D8B7A9] bg-white px-3 py-2.5 text-[#4B302A] outline-none transition focus:border-[#96796E] focus:ring-2 focus:ring-[#EDB7A6]/40 disabled:cursor-not-allowed disabled:opacity-60"
+              className="field"
             />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            {/* Status */}
             <div>
               <label
                 htmlFor="status"
-                className="mb-1.5 block text-sm font-medium text-[#4B302A]"
+                className="label"
               >
                 Status
               </label>
@@ -151,31 +148,27 @@ function TaskModal({
                 value={formData.status}
                 onChange={handleChange}
                 disabled={isSubmitting}
-                className="w-full rounded-xl border border-[#D8B7A9] bg-white px-3 py-2.5 text-[#4B302A] outline-none transition focus:border-[#96796E] focus:ring-2 focus:ring-[#EDB7A6]/40 disabled:cursor-not-allowed disabled:opacity-60"
+                className="field"
               >
                 <option value="todo">
                   To Do
                 </option>
-
                 <option value="in-progress">
                   In Progress
                 </option>
-
                 <option value="review">
                   Review
                 </option>
-
                 <option value="done">
                   Done
                 </option>
               </select>
             </div>
 
-            {/* Priority */}
             <div>
               <label
                 htmlFor="priority"
-                className="mb-1.5 block text-sm font-medium text-[#4B302A]"
+                className="label"
               >
                 Priority
               </label>
@@ -186,16 +179,14 @@ function TaskModal({
                 value={formData.priority}
                 onChange={handleChange}
                 disabled={isSubmitting}
-                className="w-full rounded-xl border border-[#D8B7A9] bg-white px-3 py-2.5 text-[#4B302A] outline-none transition focus:border-[#96796E] focus:ring-2 focus:ring-[#EDB7A6]/40 disabled:cursor-not-allowed disabled:opacity-60"
+                className="field"
               >
                 <option value="Low">
                   Low
                 </option>
-
                 <option value="Medium">
                   Medium
                 </option>
-
                 <option value="High">
                   High
                 </option>
@@ -203,13 +194,12 @@ function TaskModal({
             </div>
           </div>
 
-          {/* Assigned Member */}
           {project?.projectType ===
             "team" && (
             <div>
               <label
                 htmlFor="assignedTo"
-                className="mb-1.5 block text-sm font-medium text-[#4B302A]"
+                className="label"
               >
                 Assign To
               </label>
@@ -220,7 +210,7 @@ function TaskModal({
                 value={formData.assignedTo}
                 onChange={handleChange}
                 disabled={isSubmitting}
-                className="w-full rounded-xl border border-[#D8B7A9] bg-white px-3 py-2.5 text-[#4B302A] outline-none transition focus:border-[#96796E] focus:ring-2 focus:ring-[#EDB7A6]/40 disabled:cursor-not-allowed disabled:opacity-60"
+                className="field"
               >
                 <option value="">
                   Unassigned
@@ -244,11 +234,10 @@ function TaskModal({
             </div>
           )}
 
-          {/* Due Date */}
           <div>
             <label
               htmlFor="dueDate"
-              className="mb-1.5 block text-sm font-medium text-[#4B302A]"
+              className="label"
             >
               Due Date
             </label>
@@ -260,18 +249,17 @@ function TaskModal({
               value={formData.dueDate}
               onChange={handleChange}
               disabled={isSubmitting}
-              className="w-full rounded-xl border border-[#D8B7A9] bg-white px-3 py-2.5 text-[#4B302A] outline-none transition focus:border-[#96796E] focus:ring-2 focus:ring-[#EDB7A6]/40 disabled:cursor-not-allowed disabled:opacity-60"
+              className="field"
             />
           </div>
         </form>
 
-        {/* Actions */}
         <div className="mt-6 flex justify-end gap-3">
           <button
             type="button"
             onClick={onClose}
             disabled={isSubmitting}
-            className="rounded-xl border border-[#D8B7A9] px-4 py-2.5 text-sm font-medium text-[#795D54] transition hover:bg-[#F8E3D7] disabled:cursor-not-allowed disabled:opacity-50"
+            className="btn-secondary"
           >
             Cancel
           </button>
@@ -280,7 +268,7 @@ function TaskModal({
             type="submit"
             form="task-form"
             disabled={isSubmitting}
-            className="rounded-xl bg-[#4B302A] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#624139] disabled:cursor-not-allowed disabled:opacity-60"
+            className="btn-primary"
           >
             {isSubmitting
               ? "Creating..."

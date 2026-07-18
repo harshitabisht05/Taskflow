@@ -52,16 +52,19 @@ function EditProjectModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#4B302A]/40 p-4 backdrop-blur-[2px]">
-      <div className="w-full max-w-lg rounded-3xl border border-[#E2C4B8] bg-[#FFF9F2] p-6 shadow-xl">
+    <div className="modal-backdrop">
+      <div className="modal-panel max-w-lg">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-xl font-semibold text-[#4B302A]">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-teal-600">
+              Project
+            </p>
+            <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-950">
               Edit Project
             </h2>
 
-            <p className="mt-1 text-sm text-[#96796E]">
-              Update your project details.
+            <p className="mt-1 text-sm leading-6 text-slate-500">
+              Update the project details and delivery status.
             </p>
           </div>
 
@@ -69,9 +72,9 @@ function EditProjectModal({
             type="button"
             onClick={onClose}
             aria-label="Close edit project modal"
-            className="rounded-lg px-3 py-1 text-[#96796E] hover:bg-[#F8E3D7]"
+            className="icon-button"
           >
-            ✕
+            x
           </button>
         </div>
 
@@ -80,7 +83,7 @@ function EditProjectModal({
           className="mt-6 space-y-4"
         >
           <div>
-            <label className="mb-2 block text-sm font-medium text-[#4B302A]">
+            <label className="label">
               Project Name
             </label>
 
@@ -88,12 +91,12 @@ function EditProjectModal({
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full rounded-xl border border-[#D8B7A9] bg-white px-4 py-3 text-sm text-[#4B302A] outline-none focus:border-[#96796E]"
+              className="field"
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-[#4B302A]">
+            <label className="label">
               Description
             </label>
 
@@ -102,54 +105,52 @@ function EditProjectModal({
               value={formData.description}
               onChange={handleChange}
               rows="3"
-              className="w-full rounded-xl border border-[#D8B7A9] bg-white px-4 py-3 text-sm text-[#4B302A] outline-none focus:border-[#96796E]"
+              className="field"
             />
           </div>
 
-          <div>
-            <label className="mb-2 block text-sm font-medium text-[#4B302A]">
-              Status
-            </label>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="label">
+                Status
+              </label>
 
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="w-full rounded-xl border border-[#D8B7A9] bg-white px-4 py-3 text-sm text-[#4B302A] outline-none focus:border-[#96796E]"
-            >
-              <option value="planning">
-                Planning
-              </option>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className="field"
+              >
+                <option value="planning">
+                  Planning
+                </option>
+                <option value="active">
+                  Active
+                </option>
+                <option value="completed">
+                  Completed
+                </option>
+              </select>
+            </div>
 
-              <option value="active">
-                Active
-              </option>
+            <div>
+              <label className="label">
+                Due Date
+              </label>
 
-              <option value="completed">
-                Completed
-              </option>
-            </select>
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium text-[#4B302A]">
-              Due Date
-            </label>
-
-            <input
-              name="dueDate"
-              type="date"
-              value={formData.dueDate}
-              onChange={handleChange}
-              className="w-full rounded-xl border border-[#D8B7A9] bg-white px-4 py-3 text-sm text-[#4B302A] outline-none focus:border-[#96796E]"
-            />
+              <input
+                name="dueDate"
+                type="date"
+                value={formData.dueDate}
+                onChange={handleChange}
+                className="field"
+              />
+            </div>
           </div>
 
           {(error || serverError) && (
-            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
-              <p className="text-sm text-red-700">
-                {error || serverError}
-              </p>
+            <div className="error-box">
+              {error || serverError}
             </div>
           )}
 
@@ -157,7 +158,7 @@ function EditProjectModal({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl border border-[#D8B7A9] px-4 py-2.5 text-sm font-medium text-[#795D54] hover:bg-[#F8E3D7]"
+              className="btn-secondary"
             >
               Cancel
             </button>
@@ -165,7 +166,7 @@ function EditProjectModal({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-xl bg-[#4B302A] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#624139] disabled:opacity-60"
+              className="btn-primary"
             >
               {isSubmitting
                 ? "Saving..."
