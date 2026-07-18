@@ -26,6 +26,32 @@ const projectSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    projectType: {
+      type: String,
+      enum: ["single", "team"],
+      default: "single",
+      required: true,
+    },
+    members: [
+      {
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+
+        role: {
+          type: String,
+          enum: ["member"],
+          default: "member",
+        },
+      },
+    ],
   },
   {
     timestamps: true,

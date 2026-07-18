@@ -43,6 +43,11 @@ const taskSchema = new mongoose.Schema(
       ref: "Project",
       required: [true, "Project is required"],
     },
+    assignedTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
   },
   {
     timestamps: true,

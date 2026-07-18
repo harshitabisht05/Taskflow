@@ -7,6 +7,9 @@ function TaskCard({
   description,
   priority,
   dueDate,
+  status,
+  assignedTo,
+  disabled = false,
   onClick,
 }) {
   const {
@@ -18,6 +21,7 @@ function TaskCard({
     isDragging,
   } = useSortable({
     id,
+    disabled,
   });
 
   const style = {
@@ -30,6 +34,18 @@ function TaskCard({
     Medium: "bg-[#F5D5B8] text-[#76512F]",
     Low: "bg-[#D8E1C5] text-[#53603D]",
   };
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+const taskDueDate = dueDate
+  ? new Date(dueDate)
+  : null;
+
+const isOverdue =
+  taskDueDate &&
+  taskDueDate < today
+  &&
+  status !== "done";
 
   return (
     <article
@@ -73,12 +89,32 @@ function TaskCard({
       </p>
 
       <div className="mt-4 border-t border-[#E8D2C8] pt-3">
-        <p className="text-xs font-medium text-[#96796E]">
-          {dueDate
-            ? `Due ${dueDate}`
-            : "No due date"}
-        </p>
+        {dueDate && (
+  <p
+    className={`text-xs ${
+      isOverdue
+        ? "font-medium text-red-600"
+        : "text-[#96796E]"
+    }`}
+  >
+    {isOverdue ? "Overdue: " : "Due: "}
+    {new Date(dueDate).toLocaleDateString()}
+  </p>
+)}
       </div>
+      {assignedTo && (
+  <div className="mt-3 flex items-center gap-2">
+    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#E2C4B8] text-xs font-semibold text-[#4B302A]">
+      {assignedTo.name
+        ?.charAt(0)
+        .toUpperCase()}
+    </div>
+
+    <span className="text-xs text-[#96796E]">
+      {assignedTo.name}
+    </span>
+  </div>
+)}
     </article>
   );
 }

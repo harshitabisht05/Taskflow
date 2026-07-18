@@ -1,6 +1,14 @@
 import { Link } from "react-router-dom";
 
-function ProjectCard({ id, name, description, status, dueDate }) {
+function ProjectCard({ id, name, description, status, dueDate,projectType,role,totalTasks = 0,
+completedTasks = 0, }) {
+
+  const progress =
+  totalTasks > 0
+    ? Math.round(
+        (completedTasks / totalTasks) * 100
+      )
+    : 0;
   return (
     <Link
       to={`/projects/${id}/board`}
@@ -25,6 +33,36 @@ function ProjectCard({ id, name, description, status, dueDate }) {
       Due {dueDate}
     </p>
   </div>
+  <div className="mt-3 flex items-center justify-between">
+    <span className="text-xs font-medium text-[#795D54]">
+      {role}
+    </span>
+  </div>
+
+  <div className="mt-5">
+  <div className="flex items-center justify-between text-xs">
+    <span className="font-medium text-[#795D54]">
+      Progress
+    </span>
+
+    <span className="text-[#96796E]">
+      {progress}%
+    </span>
+  </div>
+
+  <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#F1E5DD]">
+    <div
+      className="h-full rounded-full bg-[#4B302A] transition-all duration-300"
+      style={{
+        width: `${progress}%`,
+      }}
+    />
+  </div>
+
+  <p className="mt-2 text-xs text-[#96796E]">
+    {completedTasks} of {totalTasks} tasks completed
+  </p>
+</div>
 </div>
     </Link>
   );

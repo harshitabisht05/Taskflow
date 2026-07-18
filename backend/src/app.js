@@ -3,6 +3,10 @@ const cors = require("cors");
 
 const projectRoutes = require("./routes/projectRoutes");
 const taskRoutes = require("./routes/taskRoutes");
+const authRoutes = require("./routes/authRoutes");
+const { protect } = require("./middleware/authMiddleware");
+const {  checkProjectAccess,} = require("./middleware/projectAccessMiddleware");
+const dashboardRoutes = require("./routes/dashboardRoutes");
 
 const app = express();
 
@@ -31,8 +35,12 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+// Authentication routes
+app.use("/api/auth", authRoutes);
+
 // Project routes
 app.use("/api/projects", projectRoutes);
-app.use("/api/projects/:projectId/tasks", taskRoutes);
+app.use("/api/projects/:projectId/tasks", protect,checkProjectAccess,taskRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 module.exports = app;

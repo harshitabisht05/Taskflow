@@ -1,17 +1,28 @@
 import { useState } from "react";
 
-function TaskModal({ onClose, onCreateTask  }) {
-
+function TaskModal({
+  project,
+  onClose,
+  onCreateTask,
+  isSubmitting = false,
+  serverError = "",
+}) {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     status: "todo",
     priority: "Medium",
     dueDate: "",
+    assignedTo: "",
   });
+
+  const [validationError, setValidationError] =
+    useState("");
 
   const handleChange = (event) => {
     const { name, value } = event.target;
+
+    setValidationError("");
 
     setFormData((currentFormData) => ({
       ...currentFormData,
@@ -22,12 +33,32 @@ function TaskModal({ onClose, onCreateTask  }) {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    onCreateTask(formData);
+    if (!formData.title.trim()) {
+      setValidationError(
+        "Task title is required."
+      );
+      return;
+    }
+
+    onCreateTask({
+      ...formData,
+      title: formData.title.trim(),
+      description:
+        formData.description.trim(),
+      assignedTo:
+        formData.assignedTo || null,
+      dueDate:
+        formData.dueDate || null,
+    });
   };
+
+  const displayedError =
+    validationError || serverError;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#4B302A]/40 p-4 backdrop-blur-[2px]">
-      <div className="w-full max-w-lg rounded-3xl border border-[#E2C4B8] bg-[#FFF9F2] p-6 shadow-xl">
+      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-[#E2C4B8] bg-[#FFF9F2] p-6 shadow-xl">
+        {/* Header */}
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold text-[#4B302A]">
             Create Task
@@ -36,7 +67,8 @@ function TaskModal({ onClose, onCreateTask  }) {
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg px-3 py-1 text-[#96796E] transition hover:bg-[#F8E3D7] hover:text-[#4B302A]"
+            disabled={isSubmitting}
+            className="rounded-lg px-3 py-1 text-[#96796E] transition hover:bg-[#F8E3D7] hover:text-[#4B302A] disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="Close task modal"
           >
             ✕
@@ -47,15 +79,25 @@ function TaskModal({ onClose, onCreateTask  }) {
           Add a new task to this project.
         </p>
 
+        {/* Error */}
+        {displayedError && (
+          <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+            <p className="text-sm text-red-700">
+              {displayedError}
+            </p>
+          </div>
+        )}
+
         <form
-            id="task-form"
-            onSubmit={handleSubmit}
-            className="mt-6 space-y-4"
-          >
+          id="task-form"
+          onSubmit={handleSubmit}
+          className="mt-6 space-y-4"
+        >
+          {/* Title */}
           <div>
             <label
               htmlFor="title"
-             className="mb-1.5 block text-sm font-medium text-[#4B302A]"
+              className="mb-1.5 block text-sm font-medium text-[#4B302A]"
             >
               Title
             </label>
@@ -67,10 +109,12 @@ function TaskModal({ onClose, onCreateTask  }) {
               value={formData.title}
               onChange={handleChange}
               placeholder="Enter task title"
-              className="w-full rounded-xl border border-[#D8B7A9] bg-white px-3 py-2.5 text-[#4B302A] outline-none transition focus:border-[#96796E] focus:ring-2 focus:ring-[#EDB7A6]/40"
+              disabled={isSubmitting}
+              className="w-full rounded-xl border border-[#D8B7A9] bg-white px-3 py-2.5 text-[#4B302A] outline-none transition focus:border-[#96796E] focus:ring-2 focus:ring-[#EDB7A6]/40 disabled:cursor-not-allowed disabled:opacity-60"
             />
           </div>
 
+          {/* Description */}
           <div>
             <label
               htmlFor="description"
@@ -86,11 +130,13 @@ function TaskModal({ onClose, onCreateTask  }) {
               onChange={handleChange}
               placeholder="Enter task description"
               rows="3"
-              className="w-full rounded-xl border border-[#D8B7A9] bg-white px-3 py-2.5 text-[#4B302A] outline-none transition focus:border-[#96796E] focus:ring-2 focus:ring-[#EDB7A6]/40"
+              disabled={isSubmitting}
+              className="w-full rounded-xl border border-[#D8B7A9] bg-white px-3 py-2.5 text-[#4B302A] outline-none transition focus:border-[#96796E] focus:ring-2 focus:ring-[#EDB7A6]/40 disabled:cursor-not-allowed disabled:opacity-60"
             />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
+            {/* Status */}
             <div>
               <label
                 htmlFor="status"
@@ -104,15 +150,28 @@ function TaskModal({ onClose, onCreateTask  }) {
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-[#D8B7A9] bg-white px-3 py-2.5 text-[#4B302A] outline-none transition focus:border-[#96796E] focus:ring-2 focus:ring-[#EDB7A6]/40"
+                disabled={isSubmitting}
+                className="w-full rounded-xl border border-[#D8B7A9] bg-white px-3 py-2.5 text-[#4B302A] outline-none transition focus:border-[#96796E] focus:ring-2 focus:ring-[#EDB7A6]/40 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                <option value="todo">To Do</option>
-                <option value="in-progress">In Progress</option>
-                <option value="review">Review</option>
-                <option value="done">Done</option>
+                <option value="todo">
+                  To Do
+                </option>
+
+                <option value="in-progress">
+                  In Progress
+                </option>
+
+                <option value="review">
+                  Review
+                </option>
+
+                <option value="done">
+                  Done
+                </option>
               </select>
             </div>
 
+            {/* Priority */}
             <div>
               <label
                 htmlFor="priority"
@@ -126,15 +185,66 @@ function TaskModal({ onClose, onCreateTask  }) {
                 name="priority"
                 value={formData.priority}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-[#D8B7A9] bg-white px-3 py-2.5 text-[#4B302A] outline-none transition focus:border-[#96796E] focus:ring-2 focus:ring-[#EDB7A6]/40"
+                disabled={isSubmitting}
+                className="w-full rounded-xl border border-[#D8B7A9] bg-white px-3 py-2.5 text-[#4B302A] outline-none transition focus:border-[#96796E] focus:ring-2 focus:ring-[#EDB7A6]/40 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
+                <option value="Low">
+                  Low
+                </option>
+
+                <option value="Medium">
+                  Medium
+                </option>
+
+                <option value="High">
+                  High
+                </option>
               </select>
             </div>
           </div>
 
+          {/* Assigned Member */}
+          {project?.projectType ===
+            "team" && (
+            <div>
+              <label
+                htmlFor="assignedTo"
+                className="mb-1.5 block text-sm font-medium text-[#4B302A]"
+              >
+                Assign To
+              </label>
+
+              <select
+                id="assignedTo"
+                name="assignedTo"
+                value={formData.assignedTo}
+                onChange={handleChange}
+                disabled={isSubmitting}
+                className="w-full rounded-xl border border-[#D8B7A9] bg-white px-3 py-2.5 text-[#4B302A] outline-none transition focus:border-[#96796E] focus:ring-2 focus:ring-[#EDB7A6]/40 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <option value="">
+                  Unassigned
+                </option>
+
+                {project.members?.map(
+                  (member) => (
+                    <option
+                      key={
+                        member.user._id
+                      }
+                      value={
+                        member.user._id
+                      }
+                    >
+                      {member.user.name}
+                    </option>
+                  )
+                )}
+              </select>
+            </div>
+          )}
+
+          {/* Due Date */}
           <div>
             <label
               htmlFor="dueDate"
@@ -149,16 +259,19 @@ function TaskModal({ onClose, onCreateTask  }) {
               type="date"
               value={formData.dueDate}
               onChange={handleChange}
-              className="w-full rounded-xl border border-[#D8B7A9] bg-white px-3 py-2.5 text-[#4B302A] outline-none transition focus:border-[#96796E] focus:ring-2 focus:ring-[#EDB7A6]/40"
+              disabled={isSubmitting}
+              className="w-full rounded-xl border border-[#D8B7A9] bg-white px-3 py-2.5 text-[#4B302A] outline-none transition focus:border-[#96796E] focus:ring-2 focus:ring-[#EDB7A6]/40 disabled:cursor-not-allowed disabled:opacity-60"
             />
           </div>
         </form>
 
+        {/* Actions */}
         <div className="mt-6 flex justify-end gap-3">
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl border border-[#D8B7A9] px-4 py-2.5 text-sm font-medium text-[#795D54] transition hover:bg-[#F8E3D7]"
+            disabled={isSubmitting}
+            className="rounded-xl border border-[#D8B7A9] px-4 py-2.5 text-sm font-medium text-[#795D54] transition hover:bg-[#F8E3D7] disabled:cursor-not-allowed disabled:opacity-50"
           >
             Cancel
           </button>
@@ -166,9 +279,12 @@ function TaskModal({ onClose, onCreateTask  }) {
           <button
             type="submit"
             form="task-form"
-            className="rounded-xl bg-[#4B302A] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#624139]"
+            disabled={isSubmitting}
+            className="rounded-xl bg-[#4B302A] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#624139] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Create Task
+            {isSubmitting
+              ? "Creating..."
+              : "Create Task"}
           </button>
         </div>
       </div>

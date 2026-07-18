@@ -1,6 +1,23 @@
 import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "../../context/AuthContext";
 
 function Sidebar() {
+  const navigate = useNavigate();
+const queryClient = useQueryClient();
+const { logout } = useAuth();
+
+const handleLogout = () => {
+  logout();
+
+  queryClient.clear();
+
+  navigate("/login", {
+    replace: true,
+  });
+};
+
   return (
     <aside className="min-h-screen w-20 shrink-0 bg-[#96796E] px-3 py-7 text-[#FFF4E3] md:w-64 md:px-5">
       {/* Brand */}
@@ -27,6 +44,12 @@ function Sidebar() {
           <span className="hidden md:inline">Dashboard</span>
         </NavLink>
       </nav>
+      <button
+  type="button"
+  onClick={handleLogout}
+>
+  Logout
+</button>
     </aside>
   );
 }
